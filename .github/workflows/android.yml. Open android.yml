@@ -11,7 +11,13 @@ jobs:
           test -f jarvis-project.zip || { echo "jarvis-project.zip not found in repo root"; exit 1; }
           mkdir project
           unzip -q jarvis-project.zip -d project
-          ls -R project | head -50
+      - name: Download hand landmark model
+        run: |
+          mkdir -p project/app/src/main/assets
+          curl -fL --retry 3 -o project/app/src/main/assets/hand_landmarker.task \
+            https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task
+          ls -l project/app/src/main/assets
+          test "$(stat -c%s project/app/src/main/assets/hand_landmarker.task)" -gt 1000000
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
