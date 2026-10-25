@@ -3,7 +3,7 @@
 A free, open-source personal AI assistant for Android. Say "Hey Jarvis", talk to it, chat with it,
 and control a 3D hologram with your hands through the camera.
 
-Made by Shan Akhter, India. First released 24 October 2026.
+Made by Shan Akhter. First released 24 October 2026.
 
 ## What it does
 - Hands-free "Hey Jarvis" wake word that runs on your phone (openWakeWord).

@@ -1,7 +1,7 @@
 # Fork and Branding Rules
 
 J.A.R.V.I.S. Voice Only
-Created by Shan Akhter, India. First released 24 October 2026.
+Created by Shan Akhter. First released 24 October 2026.
 Original project: github.com/shanfxr3-cmyk/Jarvis-Voice-Only
 
 Forks, remakes and mods are welcome. This is what you need to do.
