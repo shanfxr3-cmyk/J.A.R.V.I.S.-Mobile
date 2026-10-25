@@ -1,0 +1,21 @@
+J.A.R.V.I.S. Voice Only
+Copyright 2026 Shan Akhter (https://github.com/shanfxr3-cmyk)
+
+Created and first released by Shan Akhter, India, on 24 October 2026.
+Original project: https://github.com/shanfxr3-cmyk/Jarvis-Voice-Only
+Contact: shanakhter777@gmail.com
+
+If you fork, modify, remake or redistribute this project, the Apache License 2.0
+requires you to keep this NOTICE and the copyright notices in the source files.
+Please also show this credit in your app, on its About screen or wherever it lists
+notices:
+
+    Based on J.A.R.V.I.S. Voice Only by Shan Akhter
+
+State clearly which files you changed. The name, icon and look of the original app are
+not licensed for reuse; see FORK_AND_BRANDING_RULES.md. Official builds are signed with
+the key whose SHA-256 fingerprint is
+fc22042017c3ebe048da6b738da9e5ec40ee0d4786881161267e450e93fac0c7
+
+This project includes third-party software and fonts under their own licences.
+See THIRD_PARTY_NOTICES.md.
