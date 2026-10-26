@@ -11,6 +11,7 @@
 
 Made by **Shan Akhter**. First released **24 October 2026**.
 
+
 ---
 
 ## ✨ Overview
@@ -42,7 +43,8 @@ The AI itself is **[Groq](https://groq.com)** with **your own free API key**. No
 | ✅ **Tasks** | Add tasks by typing or by voice: *"add a task buy milk"* |
 | 🗂️ **Memory screen** | Your saved conversation history, with counts for messages, tasks and activity. Clear it any time |
 | 🛠️ **Tools** | Live battery and RAM, plus shortcuts to Wi-Fi, Bluetooth, app settings, notification settings and battery saver. **Each one asks you first** |
-| 🏠 **HUD Home** | AI status, system gauges, shortcuts and a recent-activity log |
+| 🌐 **Live 3D Sphere** | The Home screen centrepiece: a rotating dot-globe with a glowing core, a sweeping light band, three tilted rings with orbiting satellites and a HUD tick ring. It spins faster and ripples while Jarvis is listening, thinking or speaking, and animates only while the app is on screen. Nothing to set up |
+| 🏠 **HUD Home** | A live 3D sphere that reacts to Jarvis, AI key status, system gauges, shortcuts and a recent-activity log |
 | 🔋 **24/7 Mode** | Keeps "Hey Jarvis" listening with the screen off, with a watchdog that brings the listener back |
 | 🔄 **In-App Updates** | **Settings → About, legal and updates → Check** |
 | 🧹 **One-Tap Wipe** | **Settings → Data and privacy → Delete all app data** removes everything |
@@ -109,7 +111,7 @@ Jarvis handles these **on the phone itself** (no AI call needed). Anything else 
 3. Paste your key into **API key**.
 4. Pick a model: **GPT-OSS 120B** (default, best quality) or **GPT-OSS 20B** (faster, higher free limits).
 5. Tap **Save & test**. You should see **Connected.** in green.
-6. The Home screen now shows **KEY SET** and **AI READY**.
+6. The Home screen header now shows **KEY SET** in green.
 
 > 🔒 Your key is stored on your phone only and is sent only to `api.groq.com`.
 
@@ -366,7 +368,8 @@ app/src/main/java/com/jarvis/aiassistant/
 ├── Ai.kt                  # Groq chat (streaming, retries, fallback model)
 ├── Voice.kt, FishTts.kt   # speech recognition, phone voice, Fish Audio
 ├── HoloScreen.kt, HoloGL.kt, HandTracker.kt, Gestures.kt   # 3D hologram and hand control
-├── SettingsScreen.kt, ChatScreen.kt, HomeScreen.kt, ...    # the HUD screens
+├── HomeScreen.kt, Sphere.kt                                 # the HUD home screen and its animated 3D sphere
+├── SettingsScreen.kt, ChatScreen.kt, ...                    # the other HUD screens
 ├── Updater.kt, Integrity.kt                                 # in-app updates and signature checks
 └── Store.kt, Secrets.kt   # on-device storage and Keystore-protected keys
 ```
