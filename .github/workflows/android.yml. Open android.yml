@@ -67,7 +67,7 @@ jobs:
           APK=$(find "$SRC/app/build/outputs/apk/release" -name '*.apk' | head -n 1)
           test -n "$APK" || { echo "No APK was produced"; exit 1; }
           mkdir -p dist
-          cp "$APK" "dist/Jarvis-Voice-Only-v${VN}-build${VC}.apk"
+          cp "$APK" "dist/Jarvis-Mobile-v${VN}-build${VC}.apk"
           echo "VN=$VN" >> "$GITHUB_ENV"
           echo "VC=$VC" >> "$GITHUB_ENV"
 
@@ -81,9 +81,9 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: build-${{ env.VC }}
-          name: J.A.R.V.I.S. Voice Only v${{ env.VN }} (build ${{ env.VC }})
+          name: J.A.R.V.I.S. Mobile v${{ env.VN }} (build ${{ env.VC }})
           body: |
-            J.A.R.V.I.S. Voice Only v${{ env.VN }}, build ${{ env.VC }}.
+            J.A.R.V.I.S. Mobile v${{ env.VN }}, build ${{ env.VC }}.
             Install this over your existing app, or update from inside the app: Settings, About, Updates.
           files: dist/*.apk
           make_latest: true
