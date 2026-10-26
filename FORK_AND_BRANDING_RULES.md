@@ -1,19 +1,19 @@
 # Fork and Branding Rules
 
-J.A.R.V.I.S. Voice Only
+J.A.R.V.I.S. Mobile
 Created by Shan Akhter. First released 24 October 2026.
-Original project: github.com/shanfxr3-cmyk/Jarvis-Voice-Only
+Original project: github.com/shanfxr3-cmyk/J.A.R.V.I.S.-Mobile
 
 Forks, remakes and mods are welcome. This is what you need to do.
 
 ## You must
 - Keep the LICENSE and NOTICE files, and the copyright notices in the source files.
-- Show this credit inside your app, on its About screen or wherever it lists notices: "Based on J.A.R.V.I.S. Voice Only by Shan Akhter".
+- Show this credit inside your app, on its About screen or wherever it lists notices: "Based on J.A.R.V.I.S. Mobile by Shan Akhter".
 - Say clearly what you changed. Mark changed files, as the Apache License asks.
 - Keep the Privacy Policy honest. If your version collects data or talks to other servers, say so in your own policy.
 
 ## You must not
-- Call your app J.A.R.V.I.S. Voice Only, or use my name, icon or look in a way that makes people think yours is the original or that I made or endorse it. The Apache License does not give you the name or branding.
+- Call your app J.A.R.V.I.S. Mobile, or use my name, icon or look in a way that makes people think yours is the original or that I made or endorse it. The Apache License does not give you the name or branding.
 - Sign your build with my key. You can't, and the app will tell users yours is unofficial.
 - Remove or hide the credit.
 

@@ -1,10 +1,10 @@
 # Usage Policy
 
-J.A.R.V.I.S. Voice Only
+J.A.R.V.I.S. Mobile
 Last updated: 26 October 2026.
 
 ## 1. Purpose
-1.1 This Usage Policy (the "Policy") forms part of the Terms and Conditions and governs the conduct of every User of J.A.R.V.I.S. Voice Only (the "Application"). It is accepted again when it changes materially.
+1.1 This Usage Policy (the "Policy") forms part of the Terms and Conditions and governs the conduct of every User of J.A.R.V.I.S. Mobile (the "Application"). It is accepted again when it changes materially.
 
 ## 2. Prohibited Conduct
 2.1 The User shall not:
@@ -18,7 +18,7 @@ Last updated: 26 October 2026.
 - Present a modified build as the official Application, or imply the Developer's endorsement of it.
 
 ## 3. Official Builds
-3.1 Only builds signed with the Developer's key and published on the Releases page of github.com/shanfxr3-cmyk/Jarvis-Voice-Only are official. The About screen states whether the installed copy is official. The Developer cannot vouch for the contents of any other build.
+3.1 Only builds signed with the Developer's key and published on the Releases page of github.com/shanfxr3-cmyk/J.A.R.V.I.S.-Mobile are official. The About screen states whether the installed copy is official. The Developer cannot vouch for the contents of any other build.
 
 ## 4. Forks and Derivative Works
 4.1 Forks are permitted under the Apache License 2.0. A forking party shall retain the copyright and NOTICE attribution, state its changes, observe the Fork and Branding Rules, and adopt its own name and icon.

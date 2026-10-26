@@ -1,6 +1,6 @@
 # Open-source Licences and Credits
 
-J.A.R.V.I.S. Voice Only stands on other people's work. Thank you to all of them.
+J.A.R.V.I.S. Mobile stands on other people's work. Thank you to all of them.
 
 ## Libraries inside the app
 - Kotlin, Jetpack Compose, AndroidX (Activity, Lifecycle, Core, CameraX) and Material 3: Apache License 2.0. Copyright The Android Open Source Project, Google LLC and JetBrains s.r.o.

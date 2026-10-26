@@ -1,10 +1,10 @@
 # Terms and Conditions
 
-J.A.R.V.I.S. Voice Only
+J.A.R.V.I.S. Mobile
 Last updated: 26 October 2026. First released: 24 October 2026.
 
 ## 1. Definitions and Interpretation
-1.1 "Application" means J.A.R.V.I.S. Voice Only, including its official builds, updates and bundled documents.
+1.1 "Application" means J.A.R.V.I.S. Mobile, including its official builds, updates and bundled documents.
 1.2 "Developer" means Shan Akhter, an individual developer.
 1.3 "User" means any person who installs or uses the Application.
 1.4 "Release" means each version or build of the Application, identified by its build number.

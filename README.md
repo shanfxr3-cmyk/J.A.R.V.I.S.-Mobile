@@ -1,4 +1,4 @@
-# 🤖 J.A.R.V.I.S. Voice Only
+# 🤖 J.A.R.V.I.S. Mobile
 
 ### The free, open-source personal AI assistant for Android — by Shan Akhter
 
@@ -15,7 +15,9 @@ Made by **Shan Akhter**. First released **24 October 2026**.
 
 ## ✨ Overview
 
-J.A.R.V.I.S. Voice Only turns your Android phone into a hands-free AI assistant with a sci-fi HUD look. It waits for **"Hey Jarvis"** on the device, understands what you say, answers out loud, and keeps your chats, tasks and keys **on your phone**.
+J.A.R.V.I.S. Mobile turns your Android phone into a hands-free AI assistant with a sci-fi HUD look. It waits for **"Hey Jarvis"** on the device, understands what you say, answers out loud, and keeps your chats, tasks and keys **on your phone**.
+
+> The app shows up on your home screen as **J.A.R.V.I.S**. "J.A.R.V.I.S. Mobile" is the project name used for this repository, the releases and the legal documents.
 
 The AI itself is **[Groq](https://groq.com)** with **your own free API key**. Nothing is locked behind a subscription, and there is no account to create with the developer.
 
@@ -329,7 +331,7 @@ Go to **Actions → Android build → Run workflow**. It also runs automatically
 
 | Situation | Result |
 |---|---|
-| ✅ **All four secrets set** | The APK is signed with your key and published on **Releases** as `Jarvis-Voice-Only-v<version>-build<number>.apk`. Install it over your old copy, or update from inside the app |
+| ✅ **All four secrets set** | The APK is signed with your key and published on **Releases** as `Jarvis-Mobile-v<version>-build<number>.apk`. Install it over your old copy, or update from inside the app |
 | ⚠️ **Secrets missing** | The APK is still built and attached to the workflow run as the **`jarvis-apk`** artifact, but it uses a throwaway debug key. It will **not** update over an installed app and is **not** published as a release |
 
 ### 🔍 What the workflow does
@@ -417,4 +419,4 @@ Made by **Shan Akhter**.
 
 📧 [shanakhter777@gmail.com](mailto:shanakhter777@gmail.com)
 
-⭐ If you like J.A.R.V.I.S. Voice Only, **star the repository** to support the project!
+⭐ If you like J.A.R.V.I.S. Mobile, **star the repository** to support the project!

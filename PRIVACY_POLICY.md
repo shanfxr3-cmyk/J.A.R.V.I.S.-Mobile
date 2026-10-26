@@ -1,10 +1,10 @@
 # Privacy Policy
 
-J.A.R.V.I.S. Voice Only
+J.A.R.V.I.S. Mobile
 Last updated: 26 October 2026. First released: 24 October 2026.
 
 ## 1. Purpose and Scope
-1.1 This Privacy Policy (the "Policy") sets out how J.A.R.V.I.S. Voice Only (the "Application") handles information in connection with its use. The Application is designed, built and published by Shan Akhter, an individual developer (the "Developer", "we", "us").
+1.1 This Privacy Policy (the "Policy") sets out how J.A.R.V.I.S. Mobile (the "Application") handles information in connection with its use. The Application is designed, built and published by Shan Akhter, an individual developer (the "Developer", "we", "us").
 1.2 This Policy applies to official builds of the Application, being builds signed with the Developer's key and published on the Releases page of the project repository.
 1.3 By accepting this Policy the User acknowledges the practices described herein. Acceptance is requested again upon every update of the Application (see Section 12).
 
