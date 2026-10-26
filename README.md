@@ -1,14 +1,14 @@
 # J.A.R.V.I.S. Voice Only
 
 A free, open-source personal AI assistant for Android. Say "Hey Jarvis", talk to it, chat with it,
-and control the 3D home-screen sphere with your hands through the camera.
+and control a 3D hologram with your hands through the camera.
 
 Made by Shan Akhter. First released 24 October 2026.
 
 ## What it does
 - Hands-free "Hey Jarvis" wake word that runs on your phone (openWakeWord).
 - Voice and text chat with AI through your own free Groq key. Optional custom voice with Fish Audio.
-- Holographic particle-core sphere (Three.js in a web view) on Home, with optional hand-tracking gestures (MediaPipe) via the Hand toggle in the bottom bar.
+- 3D hologram screen with hand-tracking gestures (MediaPipe).
 - Tasks, memory, tools, and a HUD-style interface.
 - 24/7 mode that keeps the listener alive in the background.
 - Updates install over the old app. Your data stays.
