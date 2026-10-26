@@ -12,10 +12,14 @@ J.A.R.V.I.S. Voice Only stands on other people's work. Thank you to all of them.
 - openWakeWord pre-trained models, including hey_jarvis: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0), by David Scripka. The app downloads them from the openWakeWord GitHub releases the first time you turn on the wake word. Non-commercial use only.
 
 ## Fonts
-All three are licensed under the SIL Open Font License 1.1. The full text is below.
+All seven are licensed under the SIL Open Font License 1.1. The full text is below.
 - Orbitron. Copyright 2018 The Orbitron Project Authors (https://github.com/theleagueof/orbitron), with Reserved Font Name Orbitron.
-- Oswald. Copyright 2016 The Oswald Project Authors (https://github.com/googlefonts/OswaldFont).
-- Russo One. Copyright (c) 2011-2012, Jovanny Lemonad (jovanny.ru), with Reserved Font Name Russo.
+- Michroma. Copyright 2011 The Michroma Project Authors (https://github.com/googlefonts/Michroma-font).
+- Space Grotesk. Copyright 2020 The Space Grotesk Project Authors (https://github.com/floriankarsten/space-grotesk).
+- Inter. Copyright 2020 The Inter Project Authors (https://github.com/rsms/inter).
+- Plus Jakarta Sans. Copyright 2020 The Plus Jakarta Sans Project Authors (https://github.com/tokotype/PlusJakartaSans).
+- Space Mono. Copyright 2016 The Space Mono Project Authors (https://github.com/googlefonts/spacemono).
+- Roboto. Copyright 2011 The Roboto Project Authors (https://github.com/googlefonts/roboto-classic).
 
 ## Services you connect yourself
 Groq, Fish Audio, Google speech recognition and GitHub are separate services with their own terms. They are not part of this app.
