@@ -19,7 +19,7 @@ Made by Shan Akhter. First released 24 October 2026.
 3. After that, updates come from inside the app: Settings, About, Updates.
 
 ## Privacy
-No ads, no trackers, no accounts. Chats and keys stay on your phone. See PRIVACY_POLICY.md.
+No ads, no trackers, no accounts. Chats and keys are stored on your phone; messages you send to the AI go to Groq (and spoken replies to Fish Audio if you add a key). See PRIVACY_POLICY.md.
 
 ## Legal
 - Licence: Apache License 2.0 (LICENSE and NOTICE).

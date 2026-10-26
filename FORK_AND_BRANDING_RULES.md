@@ -24,3 +24,6 @@ The About screen shows OFFICIAL BUILD only if the app's signature matches that f
 
 ## Questions
 shanakhter777@gmail.com
+
+## Name notice
+- "J.A.R.V.I.S." is a name from Marvel / The Walt Disney Company fiction. This project is an independent fan-style assistant and is not affiliated with, sponsored by or endorsed by Marvel or Disney. Anyone distributing a fork widely should consider choosing a different name.

@@ -1,7 +1,7 @@
 # Privacy Policy
 
 J.A.R.V.I.S. Voice Only
-Last updated: 25 October 2026. First released: 24 October 2026.
+Last updated: 26 October 2026. First released: 24 October 2026.
 
 ## 1. Purpose and Scope
 1.1 This Privacy Policy (the "Policy") sets out how J.A.R.V.I.S. Voice Only (the "Application") handles information in connection with its use. The Application is designed, built and published by Shan Akhter, an individual developer (the "Developer", "we", "us").
@@ -11,7 +11,7 @@ Last updated: 25 October 2026. First released: 24 October 2026.
 ## 2. Executive Summary
 - The Developer operates no servers for the Application and receives no copy of the User's conversations, voice, camera frames or credentials.
 - The Application contains no advertising, no analytics, no tracking technologies and no user accounts, and no information is sold or licensed to any party.
-- Information is stored on the User's device and is removed when the Application is deleted.
+- Information is stored on the User's device (not on any server of the Developer) and is removed when the Application is deleted. Content sent to the third-party services in Section 4 is held by them under their own policies.
 - Certain functions transmit information directly from the device to independent third-party services. These are enumerated in Section 4.
 
 ## 3. Information Stored on the Device
@@ -53,7 +53,7 @@ Last updated: 25 October 2026. First released: 24 October 2026.
 - Install packages: installation of an update that the User has chosen to download. Android additionally requires the User to authorise this separately.
 
 ## 8. Retention and Deletion
-8.1 Information remains on the device until removed by the User. "Delete all app data" in Settings erases all stored information. The Memory screen erases conversation history. Uninstalling the Application removes all of it.
+8.1 Information remains on the device until removed by the User. "Delete all app data" in Settings stops the wake-word listener and erases everything the Application stored on the device: conversations, tasks, activity, name, API credentials, settings, downloaded model files and cached files. The Memory screen erases conversation history. Uninstalling the Application removes all of it.
 8.2 Retention by third parties is governed by their own policies.
 
 ## 9. Eligibility and Minors
@@ -68,8 +68,8 @@ Last updated: 25 October 2026. First released: 24 October 2026.
 ## 11. Update Integrity
 11.1 An update is offered for installation only after the Application verifies that the downloaded package is signed with the same cryptographic key as the installed copy. Installation additionally requires the confirmation of the User through the operating system.
 
-## 12. Acceptance on Every Update; Amendments
-12.1 Upon every update of the Application, the then-current Terms and Conditions, Privacy Policy and Usage Policy are presented again. The Application will not open, and background functions including the wake-word listener and update checks will remain inactive, until the User has accepted them.
+## 12. Acceptance; Amendments
+12.1 Whenever these documents change materially, the then-current Terms and Conditions, Privacy Policy and Usage Policy are presented again. Until the User has accepted them, the Application will not open, and background functions including the wake-word listener and update checks will remain inactive. Ordinary updates that do not change the documents do not require acceptance again.
 12.2 The Developer may amend this Policy at any time. The amended Policy takes effect with the Release that carries it and is subject to acceptance as described above.
 
 ## 13. Contact

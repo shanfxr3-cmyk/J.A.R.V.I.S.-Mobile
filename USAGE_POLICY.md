@@ -1,10 +1,10 @@
 # Usage Policy
 
 J.A.R.V.I.S. Voice Only
-Last updated: 25 October 2026.
+Last updated: 26 October 2026.
 
 ## 1. Purpose
-1.1 This Usage Policy (the "Policy") forms part of the Terms and Conditions and governs the conduct of every User of J.A.R.V.I.S. Voice Only (the "Application"). It is accepted again upon every update.
+1.1 This Usage Policy (the "Policy") forms part of the Terms and Conditions and governs the conduct of every User of J.A.R.V.I.S. Voice Only (the "Application"). It is accepted again when it changes materially.
 
 ## 2. Prohibited Conduct
 2.1 The User shall not:
