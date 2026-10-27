@@ -125,7 +125,8 @@ Jarvis handles these **on the phone itself** (no AI call needed). Anything else 
 2. Allow the **microphone** permission, and **notifications** on Android 13+.
 3. The first time, a small model (about **3 MB**) downloads. This needs internet once.
 4. When the status reads **WAITING**, say **"Hey Jarvis"**. You hear a beep, then speak your request.
-5. Use the **Sensitivity** slider if it hears you too rarely or too often. Higher hears more, but triggers by mistake more often.
+5. Use the **Sensitivity** slider if it hears you too rarely or too often. Higher hears more, but triggers by mistake more often. Quiet background noise and a single stray sound never wake it.
+6. To switch it off by voice, say **"Hey Jarvis, turn off wake word"** (or type it in chat). The listener stays off until you turn it back on in Settings.
 
 ### 5️⃣ (Optional) Give Jarvis a custom voice 🎤
 
@@ -143,6 +144,7 @@ Jarvis handles these **on the phone itself** (no AI call needed). Anything else 
 |---|---|
 | Type or speak a question | **AI** tab |
 | *"Hey Jarvis, what time is it?"* | Anywhere, with the wake word on |
+| *"Hey Jarvis, turn off wake word"* | Anywhere, with the wake word on |
 | Open the 3D sphere | **Home → OPEN 3D HOLOGRAM** |
 
 ---
