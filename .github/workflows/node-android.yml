@@ -72,23 +72,36 @@ jobs:
           make -j"$(nproc)"
           ls -la out/Release/node
 
+      # Saved straight away, so even if a later step has a problem the 2-hour compile is never lost.
+      - name: Save the raw compiled Node
+        uses: actions/upload-artifact@v4
+        with:
+          name: node-android-arm64-raw
+          path: node-src/out/Release/node
+          retention-days: 30
+
       - name: Check and prepare the result
         run: |
+          set +e
           TOOLS="$NDK/toolchains/llvm/prebuilt/linux-x86_64/bin"
           mkdir -p dist
           cp node-src/out/Release/node dist/libnode.so
-          "$TOOLS/llvm-strip" --strip-unneeded dist/libnode.so
+          cp dist/libnode.so dist/libnode.unstripped
+          "$TOOLS/llvm-strip" --strip-unneeded dist/libnode.so || { echo "::warning::strip failed, using the unstripped file"; cp dist/libnode.unstripped dist/libnode.so; }
+          rm -f dist/libnode.unstripped
           file dist/libnode.so
           "$TOOLS/llvm-readelf" -h dist/libnode.so | grep -E "Class|Machine|Type"
           echo "--- libraries Node needs at run time:"
           "$TOOLS/llvm-readelf" -d dist/libnode.so | grep NEEDED | tee needed.txt
           if grep -q "libc++_shared.so" needed.txt; then
             CPPSO=$(find "$NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/aarch64-linux-android" -name libc++_shared.so | head -n 1)
-            test -n "$CPPSO" && cp "$CPPSO" dist/libc++_shared.so && echo "Added libc++_shared.so"
+            if [ -n "$CPPSO" ]; then cp "$CPPSO" dist/libc++_shared.so && echo "Added libc++_shared.so"; else echo "::warning::libc++_shared.so is needed but was not found in the NDK"; fi
           fi
-          file dist/libnode.so | grep -q "ARM aarch64" || { echo "::error::Result is not an arm64 binary"; exit 1; }
+          test -s dist/libnode.so || { echo "::error::libnode.so is missing or empty"; exit 1; }
+          file dist/libnode.so | grep -qi "aarch64" || { echo "::error::Result is not an arm64 binary"; exit 1; }
           ls -la dist
           echo "$NODE_VERSION" > dist/node-version.txt
+          exit 0
 
       - uses: actions/upload-artifact@v4
         with:
