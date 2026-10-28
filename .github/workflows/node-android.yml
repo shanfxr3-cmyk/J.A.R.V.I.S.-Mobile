@@ -1,0 +1,344 @@
+name: Get Node for Android
+
+# Gets a finished Android (arm64) build of Node.js from the Termux project and prepares it for Jarvis.
+# This does NOT compile anything, so it takes a few minutes, and every problem shows up as a clear message.
+# Run it once: Actions > Get Node for Android > Run workflow. It publishes a pre-release called "node-android"
+# that the "Android build" workflow picks up. God's Eye View needs Node 24.14.0 or newer (24.x or 26.x).
+# Node.js is MIT licensed. The libraries it needs keep their own licences (OpenSSL: Apache-2.0, ICU: Unicode, c-ares: MIT, SQLite: public domain, zlib: zlib).
+on:
+  workflow_dispatch:
+    inputs:
+      package:
+        description: 'Which Termux Node package: nodejs-lts (24.x, recommended) or nodejs (26.x)'
+        required: true
+        default: 'nodejs-lts'
+        type: choice
+        options:
+          - nodejs-lts
+          - nodejs
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends binutils dpkg
+
+      - name: Write the preparation script
+        run: |
+          cat > fetch_termux_node.py <<'PYEOF'
+          #!/usr/bin/env python3
+          """
+          Takes Termux's finished Android (arm64) build of Node.js plus the libraries it needs, and prepares them for an APK.
+
+          Why renaming: Android only keeps files named lib*.so from an APK's native folder, but Termux libraries are
+          versioned (libssl.so.3). Each one is renamed to the same-length lib*_N.so form (libssl_3.so) and every reference
+          to it inside the other files is rewritten. The length never changes, so the files are not rearranged or damaged.
+          Everything is checked at build time: every file must be arm64, and every library a file asks for must either be
+          bundled or be one Android itself provides.
+          """
+          import argparse, gzip, hashlib, lzma, os, re, shutil, subprocess, sys, time, urllib.request
+
+          MIRRORS = [
+              "https://packages.termux.dev/apt/termux-main",
+              "https://plug-mirror.rcac.purdue.edu/termux/apt/termux-main",
+          ]
+          PREFIX = "data/data/com.termux/files/usr"
+          # Libraries every Android phone provides to apps (the stable NDK set).
+          SYSTEM_LIBS = {
+              "libc.so", "libm.so", "libdl.so", "liblog.so", "libz.so", "libandroid.so", "libstdc++.so",
+              "libEGL.so", "libGLESv1_CM.so", "libGLESv2.so", "libGLESv3.so", "libvulkan.so", "libOpenSLES.so",
+              "libaaudio.so", "libmediandk.so", "libnativewindow.so", "libjnigraphics.so", "libcamera2ndk.so",
+              "libsync.so", "libbinder_ndk.so", "libnativehelper.so",
+          }
+          MIN_NODE = (24, 14, 0)
+
+
+          def die(msg):
+              print("::error::" + msg)
+              sys.exit(1)
+
+
+          def fetch(url, tries=3):
+              last = None
+              for i in range(tries):
+                  try:
+                      req = urllib.request.Request(url, headers={"User-Agent": "jarvis-node-fetch"})
+                      with urllib.request.urlopen(req, timeout=120) as r:
+                          return r.read()
+                  except Exception as e:  # noqa
+                      last = e
+                      time.sleep(2 * (i + 1))
+              raise RuntimeError(f"{url}: {last}")
+
+
+          def load_index():
+              errors = []
+              for m in MIRRORS:
+                  for name, dec in (("Packages.xz", lzma.decompress), ("Packages.gz", gzip.decompress), ("Packages", lambda b: b)):
+                      url = f"{m}/dists/stable/main/binary-aarch64/{name}"
+                      try:
+                          return m, dec(fetch(url)).decode("utf-8", "replace")
+                      except Exception as e:  # noqa
+                          errors.append(str(e)[:200])
+              die("Could not download the Termux package list from any mirror:\n" + "\n".join(errors))
+
+
+          def vkey(v):
+              return [int(x) if x.isdigit() else x for x in re.split(r"[.\-+~:]", v)]
+
+
+          def parse_index(text):
+              pk = {}
+              for block in text.split("\n\n"):
+                  d, key = {}, None
+                  for line in block.splitlines():
+                      if line[:1] in " \t" and key:
+                          d[key] += "\n" + line.strip()
+                      elif ":" in line:
+                          key, val = line.split(":", 1)
+                          d[key.strip()] = val.strip()
+                  n = d.get("Package")
+                  if not n:
+                      continue
+                  old = pk.get(n)
+                  try:
+                      newer = old is None or vkey(d.get("Version", "0")) > vkey(old.get("Version", "0"))
+                  except TypeError:
+                      newer = True
+                  if newer:
+                      pk[n] = d
+              return pk
+
+
+          def parse_depends(s):
+              out = []
+              for part in (s or "").split(","):
+                  first = part.split("|")[0]
+                  first = re.sub(r"\(.*?\)", "", first).strip()
+                  if first:
+                      out.append(first)
+              return out
+
+
+          def closure(pk, root):
+              seen, todo = [], [root]
+              while todo:
+                  n = todo.pop(0)
+                  if n in seen:
+                      continue
+                  if n not in pk:
+                      print(f"::warning::Package '{n}' is not in the Termux list; skipping it.")
+                      continue
+                  seen.append(n)
+                  todo.extend(parse_depends(pk[n].get("Depends")))
+              return seen
+
+
+          def sh(*cmd):
+              return subprocess.run(cmd, capture_output=True, text=True)
+
+
+          def elf_info(path):
+              with open(path, "rb") as f:
+                  if f.read(4) != b"\x7fELF":
+                      return None
+              h = sh("readelf", "-h", path).stdout
+              d = sh("readelf", "-d", path).stdout
+              needed = re.findall(r"\(NEEDED\)\s+Shared library: \[(.+?)\]", d)
+              so = re.findall(r"\(SONAME\)\s+Library soname: \[(.+?)\]", d)
+              return {"machine": re.search(r"Machine:\s+(.+)", h).group(1).strip() if "Machine:" in h else "?",
+                      "needed": needed, "soname": so[0] if so else None}
+
+
+          def new_name(soname):
+              if soname.endswith(".so"):
+                  return soname
+              m = re.match(r"^(lib.+?)\.so\.(.+)$", soname)
+              if not m:
+                  die(f"Cannot make an Android-safe name for library '{soname}'")
+              ver = re.sub(r"[.\-]", "_", m.group(2))
+              n = m.group(1) + "_" + ver + ".so"
+              assert len(n) == len(soname), (n, soname)
+              return n
+
+
+          def parse_version(v):
+              m = re.match(r"(\d+)\.(\d+)\.(\d+)", v)
+              return tuple(int(x) for x in m.groups()) if m else None
+
+
+          def build(roots, node_version, out, check_arch=True, extra_system=()):
+              """roots: list of extracted package folders. Returns the list of files written."""
+              system = SYSTEM_LIBS | set(extra_system)
+              bymap = {}
+              for r in roots:
+                  lib = os.path.join(r, PREFIX, "lib")
+                  for dp, _, fs in os.walk(lib):
+                      for fn in fs:
+                          p = os.path.join(dp, fn)
+                          if os.path.islink(p) or not os.path.isfile(p):
+                              continue
+                          info = elf_info(p)
+                          if info:
+                              sn = info["soname"] or fn
+                              bymap.setdefault(sn, (p, info))
+              node = None
+              for r in roots:
+                  p = os.path.join(r, PREFIX, "bin", "node")
+                  if os.path.isfile(p) and not os.path.islink(p):
+                      node = p
+              if not node:
+                  die("The node program was not found in the Termux package.")
+              ninfo = elf_info(node)
+
+              keep, missing, stack = {}, [], list(ninfo["needed"])
+              while stack:
+                  sn = stack.pop()
+                  if sn in keep or sn in system:
+                      continue
+                  if sn not in bymap:
+                      missing.append(sn)
+                      continue
+                  keep[sn] = bymap[sn]
+                  stack.extend(bymap[sn][1]["needed"])
+              if missing:
+                  die("These libraries are needed but were not found in any Termux package: " + ", ".join(sorted(set(missing))))
+
+              renames = {sn: new_name(sn) for sn in keep if new_name(sn) != sn}
+              os.makedirs(out, exist_ok=True)
+
+              def rewrite(src, dst):
+                  data = open(src, "rb").read()
+                  for old, new in renames.items():
+                      data = data.replace(b"\x00" + old.encode() + b"\x00", b"\x00" + new.encode() + b"\x00")
+                  with open(dst, "wb") as f:
+                      f.write(data)
+                  os.chmod(dst, 0o755)
+
+              rewrite(node, os.path.join(out, "libnode.so"))
+              for sn, (p, _) in keep.items():
+                  rewrite(p, os.path.join(out, renames.get(sn, sn)))
+
+              # ---- verify what was written ----
+              names = set(os.listdir(out))
+              problems = []
+              for fn in sorted(names):
+                  info = elf_info(os.path.join(out, fn))
+                  if not info:
+                      problems.append(f"{fn}: not an ELF file")
+                      continue
+                  if check_arch and "AArch64" not in info["machine"]:
+                      problems.append(f"{fn}: machine is '{info['machine']}', not AArch64")
+                  if fn != "libnode.so" and info["soname"] and info["soname"] != fn:
+                      problems.append(f"{fn}: internal name is '{info['soname']}'")
+                  for n in info["needed"]:
+                      if n not in names and n not in system:
+                          problems.append(f"{fn}: needs '{n}' which is neither bundled nor provided by Android")
+              if problems:
+                  die("Verification failed:\n  " + "\n  ".join(problems))
+              # Newer phones may use 16 KB memory pages; files built for 4 KB pages can fail to load there. Report, do not fail.
+              small = []
+              for fn in sorted(names):
+                  for line in sh("readelf", "-lW", os.path.join(out, fn)).stdout.splitlines():
+                      if line.strip().startswith("LOAD"):
+                          try:
+                              if int(line.split()[-1], 16) < 0x4000:
+                                  small.append(fn)
+                                  break
+                          except ValueError:
+                              pass
+              if small:
+                  print("::warning::These files use 4 KB page alignment and may not load on phones with 16 KB pages: " + ", ".join(small))
+              with open(os.path.join(out, "node-version.txt"), "w") as f:
+                  f.write(node_version + "\n")
+              print(f"OK: node {node_version}; {len(names)} files")
+              for fn in sorted(names):
+                  print(f"  {os.path.getsize(os.path.join(out, fn)):>12,}  {fn}")
+              return sorted(names)
+
+
+          def main():
+              ap = argparse.ArgumentParser()
+              ap.add_argument("--package", default="nodejs-lts")
+              ap.add_argument("--out", default="dist")
+              ap.add_argument("--work", default="termux-work")
+              ap.add_argument("--extracted", nargs="*", help="(testing) already-extracted package folders")
+              ap.add_argument("--no-arch-check", action="store_true")
+              ap.add_argument("--extra-system", nargs="*", default=[])
+              a = ap.parse_args()
+
+              if a.extracted:
+                  build(a.extracted, "test", a.out, not a.no_arch_check, a.extra_system)
+                  return
+
+              mirror, text = load_index()
+              print("Using mirror:", mirror)
+              pk = parse_index(text)
+              if a.package not in pk:
+                  die(f"Package '{a.package}' is not in the Termux list.")
+              ver = pk[a.package].get("Version", "")
+              pv = parse_version(ver)
+              print(f"{a.package} version in Termux: {ver}")
+              if not pv or pv < MIN_NODE or pv[0] == 25:
+                  die(f"God's Eye View needs Node 24.14.0 or newer (24.x or 26.x), but Termux has {ver}.")
+              names = closure(pk, a.package)
+              print("Packages to fetch:", ", ".join(names))
+              shutil.rmtree(a.work, ignore_errors=True)
+              os.makedirs(a.work)
+              roots = []
+              for n in names:
+                  st = pk[n]
+                  deb = os.path.join(a.work, n + ".deb")
+                  data = fetch(f"{mirror}/{st['Filename']}")
+                  want = st.get("SHA256")
+                  if want and hashlib.sha256(data).hexdigest() != want:
+                      die(f"Checksum mismatch for {n}")
+                  open(deb, "wb").write(data)
+                  dest = os.path.join(a.work, "x-" + n)
+                  os.makedirs(dest)
+                  r = sh("dpkg-deb", "-x", deb, dest)
+                  if r.returncode:
+                      die(f"Could not unpack {n}: {r.stderr}")
+                  roots.append(dest)
+              build(roots, ver, a.out, not a.no_arch_check, a.extra_system)
+
+
+          if __name__ == "__main__":
+              main()
+          PYEOF
+          python3 -c "import ast,sys; ast.parse(open('fetch_termux_node.py').read()); print('script ok')"
+
+      - name: Fetch Node from Termux and prepare it
+        run: python3 fetch_termux_node.py --package "${{ inputs.package }}" --out dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: node-android-arm64
+          path: dist/*
+
+      - name: Replace the old node-android release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release delete node-android --cleanup-tag --yes --repo "$GITHUB_REPOSITORY" || true
+
+      - name: Read the Node version
+        run: echo "NODE_VERSION=$(cat dist/node-version.txt)" >> "$GITHUB_ENV"
+
+      - name: Publish as the node-android pre-release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: node-android
+          name: Node ${{ env.NODE_VERSION }} for Android (arm64)
+          prerelease: true
+          make_latest: false
+          body: |
+            Node.js ${{ env.NODE_VERSION }} for Android arm64, taken from the Termux project's build and prepared for J.A.R.V.I.S. Mobile (libraries renamed so Android keeps them).
+            Node.js is MIT licensed. Bundled libraries keep their own licences. This is not an app update.
+          files: dist/*
