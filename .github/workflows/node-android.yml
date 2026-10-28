@@ -1,0 +1,112 @@
+name: Build Node for Android
+
+# Builds the Node.js program that Jarvis runs inside the phone, straight from Node's own source code.
+# Run it ONCE (Actions > Build Node for Android > Run workflow). It takes 1 to 2 hours.
+# The result is saved as a pre-release called "node-android", and the "Android build" workflow picks it up.
+# God's Eye View needs Node 24.14.0 or newer (24.x). Node 25 is skipped on purpose.
+on:
+  workflow_dispatch:
+    inputs:
+      node_version:
+        description: 'Exact Node version, for example v24.14.0. Leave empty for the newest 24.x.'
+        required: false
+        default: ''
+      android_api:
+        description: 'Android API level to build for (24 is the lowest Node supports)'
+        required: false
+        default: '24'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - name: Pick the Node version
+        run: |
+          WANT="${{ inputs.node_version }}"
+          if [ -z "$WANT" ]; then
+            WANT=$(curl -fsSL https://nodejs.org/dist/index.json | python3 -c "import json,sys; v=[x['version'] for x in json.load(sys.stdin) if x['version'].startswith('v24.')]; print(v[0])")
+          fi
+          echo "Using Node $WANT"
+          MIN="v24.14.0"
+          if [ "$(printf '%s\n%s\n' "$MIN" "$WANT" | sort -V | head -n1)" != "$MIN" ]; then
+            echo "::error::God's Eye View needs Node $MIN or newer, but $WANT was chosen."; exit 1
+          fi
+          echo "NODE_VERSION=$WANT" >> "$GITHUB_ENV"
+
+      - name: Download Node source
+        run: |
+          curl -fsSL "https://nodejs.org/dist/${NODE_VERSION}/node-${NODE_VERSION}.tar.xz" -o node.tar.xz
+          curl -fsSL "https://nodejs.org/dist/${NODE_VERSION}/SHASUMS256.txt" -o SHASUMS256.txt
+          grep " node-${NODE_VERSION}.tar.xz\$" SHASUMS256.txt | sha256sum -c -
+          tar -xf node.tar.xz
+          mv "node-${NODE_VERSION}" node-src
+          ls node-src | head -30
+
+      - name: Find the Android NDK
+        run: |
+          NDK="${ANDROID_NDK_LATEST_HOME:-$ANDROID_NDK_HOME}"
+          test -d "$NDK" || { echo "::error::No Android NDK found on this runner"; exit 1; }
+          echo "NDK=$NDK" >> "$GITHUB_ENV"
+          echo "NDK path: $NDK"
+          cat "$NDK/source.properties" || true
+
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ninja-build ccache python3 pkg-config
+
+      - name: Configure for Android arm64
+        working-directory: node-src
+        run: |
+          test -f android-configure || { echo "::error::android-configure is missing from this Node version"; exit 1; }
+          chmod +x android-configure
+          ./android-configure "$NDK" "${{ inputs.android_api }}" arm64
+
+      - name: Compile Node (long step)
+        working-directory: node-src
+        run: |
+          make -j"$(nproc)"
+          ls -la out/Release/node
+
+      - name: Check and prepare the result
+        run: |
+          TOOLS="$NDK/toolchains/llvm/prebuilt/linux-x86_64/bin"
+          mkdir -p dist
+          cp node-src/out/Release/node dist/libnode.so
+          "$TOOLS/llvm-strip" --strip-unneeded dist/libnode.so
+          file dist/libnode.so
+          "$TOOLS/llvm-readelf" -h dist/libnode.so | grep -E "Class|Machine|Type"
+          echo "--- libraries Node needs at run time:"
+          "$TOOLS/llvm-readelf" -d dist/libnode.so | grep NEEDED | tee needed.txt
+          if grep -q "libc++_shared.so" needed.txt; then
+            CPPSO=$(find "$NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/aarch64-linux-android" -name libc++_shared.so | head -n 1)
+            test -n "$CPPSO" && cp "$CPPSO" dist/libc++_shared.so && echo "Added libc++_shared.so"
+          fi
+          file dist/libnode.so | grep -q "ARM aarch64" || { echo "::error::Result is not an arm64 binary"; exit 1; }
+          ls -la dist
+          echo "$NODE_VERSION" > dist/node-version.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: node-android-arm64
+          path: dist/*
+
+      - name: Publish as the node-android pre-release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: node-android
+          name: Node ${{ env.NODE_VERSION }} for Android (arm64)
+          prerelease: true
+          make_latest: false
+          body: |
+            Node.js ${{ env.NODE_VERSION }} built for Android arm64 from the official source. Used inside J.A.R.V.I.S. Mobile to run God's Eye View.
+            Node.js is MIT licensed (https://github.com/nodejs/node/blob/main/LICENSE). This is not an app update.
+          files: |
+            dist/libnode.so
+            dist/libc++_shared.so
+            dist/node-version.txt
+          fail_on_unmatched_files: false
