@@ -189,6 +189,26 @@ jobs:
                           if info:
                               sn = info["soname"] or fn
                               bymap.setdefault(sn, (p, info))
+              # Shortcut names (symlinks) count too: a library with no internal name is asked for by its shortcut name.
+              for r in roots:
+                  lib = os.path.join(r, PREFIX, "lib")
+                  for dp, _, fs in os.walk(lib):
+                      for fn in fs:
+                          p = os.path.join(dp, fn)
+                          if not os.path.islink(p) or fn in bymap:
+                              continue
+                          target = os.readlink(p)
+                          if target.startswith("/"):
+                              cand = os.path.join(r, target.lstrip("/"))
+                              if not os.path.exists(cand):
+                                  cand = os.path.join(r, PREFIX, os.path.relpath(target, "/" + PREFIX))
+                          else:
+                              cand = os.path.join(os.path.dirname(p), target)
+                          cand = os.path.realpath(cand)
+                          if os.path.isfile(cand):
+                              info = elf_info(cand)
+                              if info:
+                                  bymap[fn] = (cand, info)
               node = None
               for r in roots:
                   p = os.path.join(r, PREFIX, "bin", "node")
@@ -209,6 +229,16 @@ jobs:
                   keep[sn] = bymap[sn]
                   stack.extend(bymap[sn][1]["needed"])
               if missing:
+                  for sn in sorted(set(missing)):
+                      stem = re.sub(r"^lib|\.so.*$", "", sn)
+                      print(f"--- looking for files that look like '{sn}':")
+                      for r in roots:
+                          for dp, dn, fs in os.walk(r):
+                              for fn in dn + fs:
+                                  if stem and stem in fn:
+                                      fp = os.path.join(dp, fn)
+                                      extra = " -> " + os.readlink(fp) if os.path.islink(fp) else ""
+                                      print("   ", os.path.relpath(fp, r) + extra)
                   die("These libraries are needed but were not found in any Termux package: " + ", ".join(sorted(set(missing))))
 
               renames = {sn: new_name(sn) for sn in keep if new_name(sn) != sn}
