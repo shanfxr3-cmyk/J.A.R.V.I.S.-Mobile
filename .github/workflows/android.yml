@@ -35,12 +35,6 @@ jobs:
           test -n "$SETTINGS" || { echo "settings.gradle.kts not found in the zip"; exit 1; }
           echo "SRC=$(dirname "$SETTINGS")" >> "$GITHUB_ENV"
 
-      - name: Download hand tracking model
-        run: |
-          mkdir -p "$SRC/app/src/main/assets"
-          curl -L --fail --retry 3 -o "$SRC/app/src/main/assets/hand_landmarker.task" \
-            https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task
-
       - name: Prepare signing key
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
