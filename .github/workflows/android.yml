@@ -53,6 +53,18 @@ jobs:
             echo "::warning::No node-android release yet. Run the 'Get Node for Android' workflow once. This APK is built without Node."
           fi
 
+      - name: Add God's Eye View
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$SRC/app/src/main/assets/gev"
+          if gh release download gev-bundle --repo "$GITHUB_REPOSITORY" --pattern 'gev-bundle.zip' --dir "$SRC/app/src/main/assets/gev"; then
+            test -f "$SRC/app/src/main/assets/gev/gev-bundle.zip" || { echo "::error::The gev-bundle release has no gev-bundle.zip. Run 'Get God's Eye View' again."; exit 1; }
+            ls -la "$SRC/app/src/main/assets/gev"
+          else
+            echo "::warning::No gev-bundle release yet. Run the 'Get God's Eye View' workflow once. This APK is built without God's Eye View."
+          fi
+
       - name: Prepare signing key
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}

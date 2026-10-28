@@ -1,0 +1,179 @@
+name: Get God's Eye View
+
+# Run it once: Actions > Get God's Eye View > Run workflow. It builds the unmodified, MIT-licensed
+# God's Eye View (pinned to a release tag) and publishes it as a pre-release called "gev-bundle".
+# The Android build workflow picks that bundle up and packs it into the Jarvis APK.
+# Run it again only when you want a newer God's Eye View version.
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "God's Eye View tag to build (v0.3.0 is the tested one)"
+        default: 'v0.3.0'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Get the source
+        run: |
+          git clone --depth 1 --branch "${{ inputs.ref }}" https://github.com/bilawalsidhu/gods-eye-view.git gev
+          cd gev
+          echo "GEV_COMMIT=$(git rev-parse --short HEAD)" >> "$GITHUB_ENV"
+          node --version
+
+      - name: Install packages
+        working-directory: gev
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: '1'
+        run: npm ci
+
+      - name: Build the app
+        working-directory: gev
+        # The keys are filled in on the phone when the page is served, so the build only gets markers.
+        env:
+          GOOGLE_MAPS_API_KEY: __GEV_GOOGLE_MAPS_API_KEY__
+          CESIUM_ION_TOKEN: __GEV_CESIUM_ION_TOKEN__
+          MAPILLARY_CLIENT_TOKEN: __GEV_MAPILLARY_CLIENT_TOKEN__
+        run: |
+          npm run build
+          test -f dist/index.html
+          echo "markers in the build:"
+          grep -rl "__GEV_" dist | head -20 || true
+          du -sh dist
+
+      - name: Write the response headers file
+        working-directory: gev
+        run: |
+          cat > write-headers.mjs <<'EOF'
+          import { writeFileSync } from 'node:fs';
+          const { BROWSER_HEADERS, API_HEADERS } = await import('./build/vite.js');
+          writeFileSync('gev-headers.json', JSON.stringify({ browser: BROWSER_HEADERS, api: API_HEADERS }, null, 1));
+          EOF
+          node write-headers.mjs
+          cat gev-headers.json | head -c 600
+
+      - name: Collect what the server needs on the phone
+        run: |
+          set -e
+          rm -rf out && mkdir -p out/stage
+          S=out/stage
+          cp -r gev/dist gev/server gev/build gev/src gev/config "$S"/
+          mkdir -p "$S/scripts"
+          cp gev/scripts/pinokio-environment.mjs gev/scripts/google-server-key.mjs gev/scripts/project-root.mjs "$S/scripts/"
+          cp gev/package.json gev/gev-headers.json gev/LICENSE gev/THIRD_PARTY_NOTICES.md "$S"/
+          # tests are not needed on the phone
+          find "$S/server" "$S/build" "$S/src" -name '*.test.m?js' -delete
+          # runtime packages only (the browser ones are already inside dist)
+          cat > pick.mjs <<'EOF'
+          import fs from 'node:fs'; import path from 'node:path';
+          const SRC = path.resolve('gev/node_modules'); const DST = path.resolve('out/stage/node_modules');
+          const roots = ['pbf', 'satellite.js', '@mapbox/vector-tile', '@meri-imperiumi/eccodes-wasm'];
+          const done = new Set();
+          function find(name, from) {
+            for (let d = from; d.startsWith(SRC); d = path.dirname(d)) {
+              const pj = path.join(d, 'node_modules', name, 'package.json');
+              if (fs.existsSync(pj)) return path.dirname(pj);
+              if (d === SRC) break;
+            }
+            const top = path.join(SRC, name); return fs.existsSync(path.join(top, 'package.json')) ? top : null;
+          }
+          function take(name, from) {
+            const dir = find(name, from); if (!dir) { console.log('not installed (optional?):', name); return; }
+            if (done.has(dir)) return; done.add(dir);
+            const rel = path.relative(SRC, dir); fs.mkdirSync(path.join(DST, path.dirname(rel)), { recursive: true });
+            fs.cpSync(dir, path.join(DST, rel), { recursive: true });
+            const pkg = JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), 'utf8'));
+            for (const d of Object.keys(pkg.dependencies || {})) take(d, dir);
+          }
+          for (const r of roots) take(r, SRC);
+          console.log('kept packages:', [...done].map(d => path.relative(SRC, d)).join(', '));
+          EOF
+          node pick.mjs
+          du -sh "$S" "$S"/*
+
+      - name: Check every package the server imports is present
+        run: |
+          cd out/stage
+          cat > ../check.mjs <<'EOF'
+          import fs from 'node:fs'; import path from 'node:path'; import { builtinModules } from 'node:module';
+          const seen = new Set(); const bare = new Set();
+          const re = /(?:import|export)\s[^'"`]*?from\s*['"]([^'"]+)['"]|(?<![\w.])import\(\s*['"]([^'"]+)['"]\s*\)|^\s*import\s*['"]([^'"]+)['"]/gm;
+          function visit(f) {
+            if (seen.has(f) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) return; seen.add(f);
+            const s = fs.readFileSync(f, 'utf8');
+            for (const m of [...s.matchAll(re)]) {
+              const sp = m[1] || m[2] || m[3];
+              if (sp.startsWith('.')) visit(path.resolve(path.dirname(f), sp));
+              else if (!sp.startsWith('node:') && !builtinModules.includes(sp)) bare.add(sp.startsWith('@') ? sp.split('/').slice(0, 2).join('/') : sp.split('/')[0]);
+            }
+          }
+          for (const e of ['server/providers/local.js', 'server/mcp/plugin.js', 'server/standalone/key-setup.js', 'server/standalone/voiceTools.js', 'server/standalone/api-not-found.js', 'server/standalone/google-token-unavailable.js', 'build/allowedHosts.js', 'build/embed-framing.js']) visit(path.resolve(e));
+          const missing = [...bare].filter(b => !fs.existsSync(path.join('node_modules', b, 'package.json')));
+          console.log('packages imported by the server:', [...bare].join(', '));
+          if (missing.length) { console.error('MISSING in bundle:', missing.join(', ')); process.exit(1); }
+          console.log('all present');
+          EOF
+          node ../check.mjs
+
+      - name: Start the server here as a smoke test
+        run: |
+          set -e
+          ZIP=$(find . -maxdepth 2 -name 'jarvis-project*.zip' | head -n 1)
+          test -n "$ZIP" || { echo "::warning::jarvis-project.zip not in the repo, skipping the smoke test"; exit 0; }
+          mkdir -p proj && unzip -q -o "$ZIP" -d proj
+          L=$(find proj -name gev-launcher.mjs | head -n 1)
+          test -n "$L" || { echo "::warning::launcher not in the zip yet, skipping the smoke test"; exit 0; }
+          cp "$L" out/stage/gev-launcher.mjs
+          cd out/stage
+          PORT=4173 node gev-launcher.mjs > ../server.log 2>&1 &
+          sleep 8
+          cat ../server.log | head -30
+          curl -sf http://127.0.0.1:4173/gev-health | tee ../health.json
+          echo
+          node -e "const h=JSON.parse(require('fs').readFileSync('../health.json','utf8')); if(!h.ok||!h.distPresent){console.error('server not healthy',h.failures);process.exit(1)} console.log('mounts:',h.mounts.length)"
+          curl -sf -o /dev/null -w "page: HTTP %{http_code}\n" http://127.0.0.1:4173/
+          curl -s -o /dev/null -w "unknown api: HTTP %{http_code} (expect 404)\n" http://127.0.0.1:4173/api/nothing
+          for r in /api/setup/status /api/google/tiles-token; do curl -s -o /dev/null -w "$r: HTTP %{http_code}\n" http://127.0.0.1:4173$r; done
+          pkill -f gev-launcher.mjs || true
+          rm -f gev-launcher.mjs
+          rm -rf .gev-cache .gev-logs .env
+
+      - name: Zip the bundle
+        run: |
+          cd out/stage
+          zip -qr -9 ../gev-bundle.zip .
+          cd ..
+          ls -la gev-bundle.zip
+          echo "BUNDLE_MB=$(du -m gev-bundle.zip | cut -f1)" >> "$GITHUB_ENV"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gev-bundle
+          path: out/gev-bundle.zip
+
+      - name: Replace the old gev-bundle release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release delete gev-bundle --cleanup-tag --yes --repo "$GITHUB_REPOSITORY" || true
+
+      - name: Publish as the gev-bundle pre-release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: gev-bundle
+          name: God's Eye View ${{ inputs.ref }} for Jarvis (${{ env.BUNDLE_MB }} MB)
+          prerelease: true
+          make_latest: false
+          body: |
+            God's Eye View ${{ inputs.ref }} (commit ${{ env.GEV_COMMIT }}), built unmodified from https://github.com/bilawalsidhu/gods-eye-view (MIT licence), with its server code and the few runtime packages it needs.
+            This is not an app update.
+          files: out/gev-bundle.zip
