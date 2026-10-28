@@ -41,30 +41,6 @@ jobs:
           curl -L --fail --retry 3 -o "$SRC/app/src/main/assets/hand_landmarker.task" \
             https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task
 
-      - name: Add Node.js for Android
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          mkdir -p "$SRC/app/src/main/jniLibs/arm64-v8a"
-          if gh release download node-android --repo "$GITHUB_REPOSITORY" --pattern '*.so' --dir "$SRC/app/src/main/jniLibs/arm64-v8a"; then
-            test -f "$SRC/app/src/main/jniLibs/arm64-v8a/libnode.so" || { echo "::error::The node-android release has no libnode.so. Run 'Get Node for Android' again."; exit 1; }
-            ls -la "$SRC/app/src/main/jniLibs/arm64-v8a"
-          else
-            echo "::warning::No node-android release yet. Run the 'Get Node for Android' workflow once. This APK is built without Node."
-          fi
-
-      - name: Add God's Eye View
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          mkdir -p "$SRC/app/src/main/assets/gev"
-          if gh release download gev-bundle --repo "$GITHUB_REPOSITORY" --pattern 'gev-bundle.zip' --dir "$SRC/app/src/main/assets/gev"; then
-            test -f "$SRC/app/src/main/assets/gev/gev-bundle.zip" || { echo "::error::The gev-bundle release has no gev-bundle.zip. Run 'Get God's Eye View' again."; exit 1; }
-            ls -la "$SRC/app/src/main/assets/gev"
-          else
-            echo "::warning::No gev-bundle release yet. Run the 'Get God's Eye View' workflow once. This APK is built without God's Eye View."
-          fi
-
       - name: Prepare signing key
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
