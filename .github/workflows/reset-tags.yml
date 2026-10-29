@@ -1,0 +1,21 @@
+name: Reset tags
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  reset:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - run: |
+          gh release list --limit 500 --json tagName --jq '.[].tagName' |
+          while read -r tag; do
+            gh release delete "$tag" --cleanup-tag --yes
+          done
+          gh api --paginate "repos/$GH_REPO/git/matching-refs/tags" --jq '.[].ref | sub("^refs/";"")' |
+          while read -r ref; do
+            gh api -X DELETE "repos/$GH_REPO/git/$ref"
+          done
