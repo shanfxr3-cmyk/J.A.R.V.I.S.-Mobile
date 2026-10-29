@@ -8,8 +8,7 @@ Last updated: 29 October 2026.
 
 ## 2. Prohibited Conduct
 2.1 The User shall not:
-- Use the microphone, the wake word or the World Watch viewers to surveil, stalk, harass, locate or record any person without the consent that applicable law requires;
-- Use World Watch information to harass or endanger any person, or to interfere with emergency, aviation or maritime operations;
+- Use the microphone or the wake word to surveil, stalk, harass, locate or record any person without the consent that applicable law requires;
 - Use the Application to create or distribute unlawful content, fraud, malware, threats, or any content that exploits or harms children;
 - Impersonate any person, or deceive others in a manner that causes harm;
 - Subject Third-Party Services to automated abuse, or attempt to circumvent their limits;

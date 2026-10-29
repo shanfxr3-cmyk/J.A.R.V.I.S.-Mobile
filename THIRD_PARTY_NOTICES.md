@@ -4,7 +4,6 @@ J.A.R.V.I.S. Mobile stands on other people's work. Thank you to all of them.
 
 ## Libraries inside the app
 - Kotlin, Jetpack Compose, AndroidX (Activity, Lifecycle, Core) and Material 3: Apache License 2.0. Copyright The Android Open Source Project, Google LLC and JetBrains s.r.o.
-- OkHttp and Okio: Apache License 2.0. Copyright Square, Inc. Used for the live AISStream connection in World Watch.
 - ONNX Runtime for Android: MIT License. Copyright Microsoft Corporation. Runs the wake-word models.
 - openWakeWord (code): Apache License 2.0. Copyright David Scripka.
 
@@ -22,17 +21,6 @@ All six are licensed under the SIL Open Font License 1.1. The full text is below
 
 ## Data and services you connect yourself
 Groq, Fish Audio, Google speech recognition and GitHub are separate services with their own terms. They are not part of this app.
-
-World Watch only reads public data from the providers below, in real time. Nothing is bundled in the app. Each provider's data remains subject to that provider's own terms, licence and attribution requirements.
-- U.S. Geological Survey (USGS): earthquake feeds.
-- Global Disaster Alert and Coordination System (GDACS): disaster alerts.
-- U.S. National Weather Service (NOAA): severe weather alerts.
-- The GDELT Project: news search.
-- Where The ISS At: position of the International Space Station.
-- adsb.lol: community-fed aircraft data.
-- AISStream: ship positions, with the User's own free key.
-- Windy: the embedded wind map.
-- LiveATC and the publishers of live-camera pages: opened only when the User taps a link.
 
 ## SIL Open Font License 1.1
 SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
