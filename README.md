@@ -220,7 +220,7 @@ You do **not** need Android Studio. GitHub builds the APK for you. ☁️
 
 ```
 your-repo/
-├── .github/workflows/android.yml     # the build workflow (name it anything .yml)
+├── .github/workflows/build.yml       # the build workflow (name it anything .yml)
 ├── jarvis-project.zip                # the Android project (settings.gradle.kts inside)
 └── (README, LICENSE, NOTICE and policy files are synced here by the workflow)
 ```
@@ -314,7 +314,7 @@ Go to **Actions → Android build → Run workflow**. It also runs automatically
 6. ⬆️ A second job, which never runs project code and never sees your key, publishes a Release tagged `build-<number>` (only when signed with your key, and only on the default branch).
 7. 📄 Copies the licence and policy files (including this README) back to the repo root.
 
-> 🔢 **Version numbers:** the app's version code is the GitHub run number plus 100, and the Release tag is `build-<that number>`. That is how the in-app updater knows a Release is newer.
+> 🔢 **Version numbers:** the app's version code is the GitHub run number, and the Release tag is `build-<that number>`. That is how the in-app updater knows a Release is newer.
 
 ### 🧪 Handy build switches
 
