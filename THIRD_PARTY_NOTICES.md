@@ -20,6 +20,7 @@ All six are licensed under the SIL Open Font License 1.1. The full text is below
 - Roboto. Copyright 2011 The Roboto Project Authors (https://github.com/googlefonts/roboto-classic).
 
 ## Data and services you connect yourself
+God's Eye View (github.com/bilawalsidhu/gods-eye-view) is MIT licensed, Copyright Bilawal Sidhu. It is not bundled in the app. The World screen only shows a copy that you run yourself (Termux) or host.
 Groq, Fish Audio, Google speech recognition and GitHub are separate services with their own terms. They are not part of this app.
 
 ## SIL Open Font License 1.1
