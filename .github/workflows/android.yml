@@ -8,23 +8,44 @@ on:
     paths:
       - 'jarvis-project.zip'
 
-permissions:
-  contents: write
+# No permissions by default. Each job below asks only for what it needs.
+permissions: {}
+
+# One build per branch at a time. Never cancel a running build half-way through a release.
+concurrency:
+  group: android-build-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
+  # ---------------------------------------------------------------------------------------------
+  # JOB 1: build. Runs the project's Gradle code and holds the signing secrets.
+  # It has a READ-ONLY token and does not keep git credentials, so build code cannot push or release.
+  # ---------------------------------------------------------------------------------------------
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    outputs:
+      signed: ${{ steps.sign.outputs.signed }}
+      version-name: ${{ steps.name.outputs.vn }}
+      version-code: ${{ steps.name.outputs.vc }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
+      # Caches ~/.gradle (dependencies, wrapper, build cache). Only the default branch WRITES the cache,
+      # other branches only read it. Do not also set "cache: gradle" on setup-java: they would fight.
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
+          cache-read-only: ${{ github.ref_name != github.event.repository.default_branch }}
 
       - name: Unpack project
         run: |
@@ -36,14 +57,18 @@ jobs:
           echo "SRC=$(dirname "$SETTINGS")" >> "$GITHUB_ENV"
 
       - name: Prepare signing key
+        id: sign
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         run: |
           if [ -n "$KEYSTORE_BASE64" ]; then
-            echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/jarvis-release.jks"
+            umask 077
+            printf '%s' "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/jarvis-release.jks"
             echo "KEYSTORE_PATH=$RUNNER_TEMP/jarvis-release.jks" >> "$GITHUB_ENV"
+            echo "signed=true" >> "$GITHUB_OUTPUT"
           else
-            echo "::warning::KEYSTORE_BASE64 secret is missing. This APK will NOT update over your installed app and will not be published as a release."
+            echo "signed=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::KEYSTORE_BASE64 secret is missing. This APK is signed with the debug key, will NOT update over your installed app and will not be published as a release."
           fi
 
       - name: Build signed release APK
@@ -54,39 +79,114 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: gradle --no-daemon assembleRelease
 
+      # Whatever happens above, never leave the decoded key on the runner.
+      - name: Remove signing key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/jarvis-release.jks"
+
       - name: Name the APK
+        id: name
         run: |
           VN=$(grep -oP 'versionName = "\K[^"]+' "$SRC/app/build.gradle.kts" | head -n 1)
-          VC=$((GITHUB_RUN_NUMBER + 100))
+          test -n "$VN" || { echo "versionName not found in app/build.gradle.kts"; exit 1; }
+          VC=$((GITHUB_RUN_NUMBER + 100))   # must match versionCode in app/build.gradle.kts
           APK=$(find "$SRC/app/build/outputs/apk/release" -name '*.apk' | head -n 1)
           test -n "$APK" || { echo "No APK was produced"; exit 1; }
           mkdir -p dist
-          cp "$APK" "dist/Jarvis-Mobile-v${VN}-build${VC}.apk"
-          echo "VN=$VN" >> "$GITHUB_ENV"
-          echo "VC=$VC" >> "$GITHUB_ENV"
+          NAME="Jarvis-Mobile-v${VN}-build${VC}.apk"
+          cp "$APK" "dist/$NAME"
+          (cd dist && sha256sum "$NAME" > "$NAME.sha256")
+          echo "vn=$VN" >> "$GITHUB_OUTPUT"
+          echo "vc=$VC" >> "$GITHUB_OUTPUT"
+
+      # Catches the one mistake that breaks every user's in-app update: shipping an APK signed with the wrong key.
+      - name: Check the signing certificate
+        if: steps.sign.outputs.signed == 'true'
+        run: |
+          APKSIGNER=$(ls -d "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -n 1)
+          APK=$(ls dist/*.apk | head -n 1)
+          GOT=$("$APKSIGNER" verify --print-certs "$APK" | grep -m1 'certificate SHA-256 digest' | awk '{print $NF}' | tr 'A-F' 'a-f')
+          WANT=$(grep -oP 'OFFICIAL_CERT_SHA256", "\\"\K[0-9a-fA-F]+' "$SRC/app/build.gradle.kts" | tr 'A-F' 'a-f')
+          echo "APK certificate : $GOT"
+          echo "Expected (gradle): $WANT"
+          if [ -z "$GOT" ]; then
+            echo "::warning::Could not read the APK certificate."
+          elif [ "$GOT" != "$WANT" ]; then
+            echo "::warning::The APK is signed with a key that does not match OFFICIAL_CERT_SHA256 in app/build.gradle.kts. The app will show UNOFFICIAL, and users on a different key cannot update. Fork owners: put your own fingerprint there."
+          fi
+
+      - name: Collect licence and policy files
+        run: |
+          mkdir -p legal
+          for f in LICENSE NOTICE README.md SECURITY.md PRIVACY_POLICY.md TERMS_AND_CONDITIONS.md USAGE_POLICY.md FORK_AND_BRANDING_RULES.md THIRD_PARTY_NOTICES.md; do
+            if [ -f "$SRC/$f" ]; then cp "$SRC/$f" "legal/$f"; fi
+          done
 
       - uses: actions/upload-artifact@v4
         with:
           name: jarvis-apk
-          path: dist/*.apk
+          path: dist/*
+          retention-days: 14
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: legal-files
+          path: legal/*
+          retention-days: 1
+          if-no-files-found: ignore
+
+  # ---------------------------------------------------------------------------------------------
+  # JOB 2: publish. Has the WRITE token but never runs project code and never sees the signing key.
+  # Only runs on the default branch, so a test run from another branch cannot create a release.
+  # ---------------------------------------------------------------------------------------------
+  publish:
+    needs: build
+    if: github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: jarvis-apk
+          path: dist
 
       - name: Publish release (only when signed with your key)
-        if: env.KEYSTORE_PATH != ''
+        if: needs.build.outputs.signed == 'true'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: build-${{ env.VC }}
-          name: J.A.R.V.I.S. Mobile v${{ env.VN }} (build ${{ env.VC }})
+          tag_name: build-${{ needs.build.outputs.version-code }}
+          name: J.A.R.V.I.S. Mobile v${{ needs.build.outputs.version-name }} (build ${{ needs.build.outputs.version-code }})
           body: |
-            J.A.R.V.I.S. Mobile v${{ env.VN }}, build ${{ env.VC }}.
+            J.A.R.V.I.S. Mobile v${{ needs.build.outputs.version-name }}, build ${{ needs.build.outputs.version-code }}.
             Install this over your existing app, or update from inside the app: Settings, About, Updates.
-          files: dist/*.apk
+            The .sha256 file is the checksum of the APK.
+          files: |
+            dist/*.apk
+            dist/*.sha256
+          fail_on_unmatched_files: true
           make_latest: true
+
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: legal-files
+          path: legal
 
       - name: Sync legal files to repo root
         run: |
-          for f in LICENSE NOTICE README.md SECURITY.md PRIVACY_POLICY.md TERMS_AND_CONDITIONS.md USAGE_POLICY.md FORK_AND_BRANDING_RULES.md THIRD_PARTY_NOTICES.md; do
-            if [ -f "$SRC/$f" ]; then cp "$SRC/$f" "./$f"; git add "./$f"; fi
-          done
+          if [ -d legal ]; then
+            for f in legal/*; do
+              [ -f "$f" ] && cp "$f" "./$(basename "$f")" && git add "./$(basename "$f")"
+            done
+          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git diff --cached --quiet || { git commit -m "Sync licence and policy files" && git push || true; }
+          if ! git diff --cached --quiet; then
+            git commit -m "Sync licence and policy files"
+            git push || echo "::warning::Could not push the legal-file sync (the branch moved). Run the workflow again if you need it."
+          fi
