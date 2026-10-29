@@ -15,7 +15,8 @@ jobs:
           while read -r tag; do
             gh release delete "$tag" --cleanup-tag --yes
           done
-          gh api --paginate "repos/$GH_REPO/git/matching-refs/tags" --jq '.[].ref | sub("^refs/";"")' |
+          gh api --paginate "repos/$GH_REPO/git/matching-refs/tags" --jq '.[].ref' |
           while read -r ref; do
+            echo "Deleting $ref"
             gh api -X DELETE "repos/$GH_REPO/git/$ref"
           done
