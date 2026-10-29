@@ -2,7 +2,7 @@
 
 ### The free, open-source personal AI assistant for Android — by Shan Akhter
 
-> 🗣️ Say **"Hey Jarvis"**, talk to it, chat with it, and control a 3D hologram with your bare hands through the camera.
+> 🗣️ Say **"Hey Jarvis"**, talk to it, chat with it, and keep an eye on the world with live public feeds.
 
 ![Platform](https://img.shields.io/badge/platform-Android%208.0%2B-3DDC84)
 ![Licence](https://img.shields.io/badge/licence-Apache%202.0-blue)
@@ -39,10 +39,10 @@ The AI itself is **[Groq](https://groq.com)** with **your own free API key**. No
 | 🧠 **Groq AI** | Default model **GPT-OSS 120B** (best quality). Switch to **GPT-OSS 20B** for faster replies and higher free limits, or type any Groq model ID |
 | 🗣️ **Spoken Replies** | Uses your phone's own text-to-speech. Turn it on or off with **SPEAK** |
 | 🎤 **Custom Voice (optional)** | Add a **Fish Audio** key and voice ID for a custom voice. If it fails or is blank, the phone voice is used automatically |
-| 🖐️ **3D Hologram** | A 3D sphere you control by touch, or with your **bare hands** through the camera (MediaPipe hand tracking) |
 | ✅ **Tasks** | Add tasks by typing or by voice: *"add a task buy milk"* |
 | 🗂️ **Memory screen** | Your saved conversation history, with counts for messages, tasks and activity. Clear it any time |
 | 🛠️ **Tools** | Live battery and RAM, plus shortcuts to Wi-Fi, Bluetooth, app settings, notification settings and battery saver. **Each one asks you first** |
+| 🌍 **World Watch** | Free public feeds, no accounts: earthquakes, disaster alerts, severe weather, keyword news, the ISS, a wind map, aircraft emergencies, ships and live pages. Optional background alerts. See [World Watch](#-world-watch) |
 | 🌐 **Live 3D Sphere** | The Home screen centrepiece: a rotating dot-globe with a glowing core, a sweeping light band, three tilted rings with orbiting satellites and a HUD tick ring. It spins faster and ripples while Jarvis is listening, thinking or speaking, and animates only while the app is on screen. Nothing to set up |
 | 🏠 **HUD Home** | A live 3D sphere that reacts to Jarvis, AI key status, system gauges, shortcuts and a recent-activity log |
 | 🔋 **24/7 Mode** | Keeps "Hey Jarvis" listening with the screen off, with a watchdog that brings the listener back |
@@ -61,7 +61,10 @@ Jarvis handles these **on the phone itself** (no AI call needed). Anything else 
 | *"What are my tasks?"* / *"list tasks"* | 📋 Reads out your open tasks |
 | *"What time is it?"* | 🕐 Tells you the time |
 | *"What's the date?"* / *"what day is it?"* | 📅 Tells you today's date |
-| *"Open settings"* / *"go to tasks"* | 🧭 Switches screen: home, chat, 3D hologram, tasks, memory, tools, settings |
+| *"Open settings"* / *"go to tasks"* | 🧭 Switches screen: home, chat, tasks, memory, tools, settings, world watch |
+| *"Latest earthquake"* | 🌋 Reads the last earthquake result (from the last World Watch check) |
+| *"Disaster alerts"* | 🚨 Reads the last disaster-alert result |
+| *"World watch news"* | 📰 Reads the last keyword-news result |
 | *Anything else* | 🧠 Sent to the AI as a normal question |
 
 > 💡 Jarvis is an **assistant you talk to**, not a phone-controller. It opens its own screens and adds tasks, but it does not tap around other apps for you. The Tools screen only offers actions Android allows, and each one asks first.
@@ -83,7 +86,7 @@ Jarvis handles these **on the phone itself** (no AI call needed). Anything else 
 
 1. 📦 Open the **[Releases](../../releases)** page of this repository and download the newest **APK**.
 2. 📱 Open the APK to install it. If Android asks, allow **"Install unknown apps"** for your browser or file manager.
-3. 📜 On first launch you see an **AUTHORISATION REQUIRED** screen. Read the key points, tick the box, and accept to continue.
+3. 📜 On first launch you see an **AUTHORISATION REQUIRED** screen. Read the key points, tick the box, and accept to continue. You see it again only after an update that changes the legal documents.
 4. 🔄 After that, updates come from inside the app: **Settings → About, legal and updates**.
 
 > 💡 An update installs **over** the old app only when both APKs are signed with the **same key**. Always install official builds from this repository's Releases page.
@@ -145,38 +148,31 @@ Jarvis handles these **on the phone itself** (no AI call needed). Anything else 
 | Type or speak a question | **AI** tab |
 | *"Hey Jarvis, what time is it?"* | Anywhere, with the wake word on |
 | *"Hey Jarvis, turn off wake word"* | Anywhere, with the wake word on |
-| Open the 3D sphere | **Home → OPEN 3D HOLOGRAM** |
+| Open World Watch | **Home → WORLD WATCH**, or say *"open world watch"* |
 
 ---
 
-## 🖐️ 3D Hologram and Hand Gestures
+## 🌍 World Watch
 
-Open it from **Home → OPEN 3D HOLOGRAM**, or say *"open hologram"*.
+Open it from **Home → WORLD WATCH**, or say *"open world watch"*. It uses **free public feeds with no accounts**. Nothing is bundled in the app and nothing runs until you switch a feed on or open it.
 
-### 👆 Touch controls
+| Feed | Source | Notes |
+|---|---|---|
+| 🌋 **Earthquakes** | USGS | You choose the minimum magnitude |
+| 🚨 **Disaster alerts** | GDACS | Orange and red alerts worldwide |
+| ⛈️ **Severe weather** | NOAA / National Weather Service | United States only |
+| 📰 **Keyword news** | GDELT | The last hour, in 100+ languages, for keywords you choose |
+| 🛰️ **ISS** | Where The ISS At | Current position |
+| 🌬️ **Wind map** | Windy | Opens on your area, and stays on windy.com |
+| ✈️ **Aircraft** | adsb.lol | Emergency codes 7700 / 7600 / 7500 worldwide, and military aircraft near your area |
+| 🚢 **Ships** | AISStream | Needs your own free key. Listens for about 8 seconds, manual only |
+| 🎥 **Live pages** | LiveATC and official live-cam sites | Open **inside** Jarvis, never in another app, and only over https |
 
-| Gesture | Action |
-|---|---|
-| **Drag** | Rotate (flick for momentum) |
-| **Pinch** | Zoom |
-| **Two fingers** | Move |
-| **Double-tap** | Reset |
+**Your area.** Type a latitude, longitude and radius in World Watch. Jarvis **never reads your phone's location** and has no location permission.
 
-### 🖐️ Hand controls (camera)
+**Background alerts.** Switch them on and pick 15, 30 or 60 minutes. Jarvis checks only the feeds you switched on and posts a notification for new items. The first check after switching on only records what already exists, so you do not get a flood. Android may delay the checks to save battery, and notifications must be allowed. Alerts can be spoken when the listener is idle.
 
-Tap **START HAND TRACKING** and allow the **camera** permission.
-
-| Your hands | Action |
-|---|---|
-| 🤏 **Pinch** (thumb + index) and move | Move the sphere |
-| ✊ **Fist** and move | Rotate it (release to flick) |
-| 🤏🤏 **Two pinches**, apart or together | Scale up or down |
-| 🔍 **Scale past about 3×** | Enter the core |
-| ✊✊ **Two fists for 1.5 s** | Reset |
-
-> 💡 **Tips:** hold the phone **40–60 cm** away so both hands fit, use good lighting, and use **CAM VIEW** to see what the camera sees. **HAND CTRL** switches hand control on or off. A stats panel shows hand count, FPS, latency and confidence.
->
-> The hand-tracking model is included in official builds. If it is missing, the app downloads it **once** from Google's MediaPipe storage.
+> ⚠️ **World Watch is not an emergency warning system.** Feeds can be late, incomplete or wrong, and alerts can fail to arrive. Follow your local official authorities for anything that matters.
 
 ---
 
@@ -219,8 +215,9 @@ Tap **START HAND TRACKING** and allow the **camera** permission.
 | 😴 **Listener keeps dying** | Follow the **24/7 checklist** above, and tap the **Resume** notification after a restart |
 | 🔈 **I can't hear replies** | Make sure **SPEAK** is on and the volume is up. If you see "No text-to-speech engine installed", install **Google Speech Services** |
 | 🎤 **Custom voice not used** | Fish Audio needs **both** the API key and the Voice ID. If it fails, the phone voice is used on purpose |
-| 🖐️ **Hologram doesn't react to hands** | Allow the camera permission, tap **START HAND TRACKING**, make sure **HAND CTRL** is ON, and use good light |
-| 🐢 **Hologram stutters** | The app switches from GPU to CPU detection by itself. **ACCEL CPU** is the smooth default |
+| 🌍 **World Watch shows "Not loaded yet" or an error** | Check your connection and pull the feed again. Free public feeds sometimes go down or rate-limit; try again later |
+| 🚢 **Ships say "Save your free AISStream key first"** | Get a free key at **aisstream.io**, paste it in World Watch with your area, and tap **Save area and key** |
+| 🔔 **No World Watch alerts** | Switch alerts on, keep notifications allowed, and follow the **24/7 checklist** for battery limits. The first check only records existing items |
 | 🔄 **Update check fails** | GitHub limits anonymous checks. Wait a few minutes and tap **Check** again |
 | 📥 **APK won't open** | Allow **Install unknown apps** for the app you downloaded it with |
 | 🧹 **Start fresh** | **Settings → Data and privacy → Delete all app data** |
@@ -235,8 +232,10 @@ Tap **START HAND TRACKING** and allow the **camera** permission.
   - 🧠 Your messages go **straight from your phone to Groq** to get an answer.
   - 🎤 Spoken replies go to **Fish Audio** only if you add a key.
   - 🗣️ Speech recognition may be processed by **Google**.
-  - 🔄 Update checks and first-time model downloads contact **GitHub** and **Google's MediaPipe storage**.
-- 🧹 **Delete all app data** removes tasks, messages, activity, API keys, downloaded models and settings, and stops the listener.
+  - 🔄 Update checks and first-time wake-word model downloads contact **GitHub**.
+  - 🌍 World Watch contacts its public data providers only for the feeds you use. Only your keywords (news), your typed area (wind map, ships) and your own AISStream key (ships) are ever sent. Pages you open in the in-app browser are run by their own publishers.
+- 🚫 **No camera and no location.** Jarvis has neither permission.
+- 🧹 **Delete all app data** removes tasks, messages, activity, API keys, World Watch settings, in-app browser data, downloaded models and settings, and stops the listener and the alerts.
 
 See [PRIVACY_POLICY.md](PRIVACY_POLICY.md) for the full text.
 
@@ -341,11 +340,11 @@ Go to **Actions → Android build → Run workflow**. It also runs automatically
 ### 🔍 What the workflow does
 
 1. 📂 Unpacks `jarvis-project.zip` and finds `settings.gradle.kts`.
-2. 🖐️ Downloads the MediaPipe **hand-tracking model** into the app's assets.
-3. 🔐 Decodes your signing key from the secrets.
-4. 🔨 Builds the signed **release APK** with Gradle 8.9 and JDK 17.
-5. 🏷️ Names the APK with the version and build number.
-6. ⬆️ Uploads it as an artifact, and publishes a Release tagged `build-<number>` (only when signed with your key).
+2. 🔐 Decodes your signing key from the secrets (only if they are set) and removes it again when the build ends.
+3. 🔨 Builds the signed **release APK** with Gradle 8.9 and JDK 17. This job has a **read-only** token, so build code cannot push or publish anything.
+4. 🏷️ Names the APK with the version and build number and writes a **`.sha256`** checksum next to it.
+5. 🧾 Checks that the APK's signing certificate matches `OFFICIAL_CERT_SHA256` and warns if it does not.
+6. ⬆️ A second job, which never runs project code and never sees your key, publishes a Release tagged `build-<number>` (only when signed with your key, and only on the default branch).
 7. 📄 Copies the licence and policy files (including this README) back to the repo root.
 
 > 🔢 **Version numbers:** the app's version code is the GitHub run number plus 100, and the Release tag is `build-<that number>`. That is how the in-app updater knows a Release is newer.
@@ -369,10 +368,12 @@ app/src/main/java/com/jarvis/aiassistant/
 ├── WakeWord.kt            # openWakeWord detector
 ├── Ai.kt                  # Groq chat (streaming, retries, fallback model)
 ├── Voice.kt, FishTts.kt   # speech recognition, phone voice, Fish Audio
-├── HoloScreen.kt, HoloGL.kt, HandTracker.kt, Gestures.kt   # 3D hologram and hand control
+├── WorldScreen.kt, WorldWatch.kt                            # World Watch screen, feeds and background alerts
 ├── HomeScreen.kt, Sphere.kt                                 # the HUD home screen and its animated 3D sphere
 ├── SettingsScreen.kt, ChatScreen.kt, ...                    # the other HUD screens
+├── KeepAlive.kt, Power.kt                                   # 24/7 mode, watchdog and battery settings
 ├── Updater.kt, Integrity.kt                                 # in-app updates and signature checks
+├── Legal.kt                                                 # consent screen and legal documents
 └── Store.kt, Secrets.kt   # on-device storage and Keystore-protected keys
 ```
 
@@ -401,10 +402,11 @@ app/src/main/java/com/jarvis/aiassistant/
 | Piece | Used for |
 |---|---|
 | [openWakeWord](https://github.com/dscripka/openWakeWord) + ONNX Runtime | "Hey Jarvis" detection on the phone |
-| [MediaPipe Hand Landmarker](https://ai.google.dev/edge/mediapipe) | Hand tracking for the 3D hologram |
 | [Groq](https://groq.com) (your own key) | The AI that answers you |
 | [Fish Audio](https://fish.audio) (optional, your own key) | A custom voice |
-| Jetpack Compose + CameraX | The HUD interface and the camera |
+| [OkHttp](https://square.github.io/okhttp/) | The live ship feed in World Watch |
+| USGS, GDACS, NOAA, GDELT, adsb.lol, AISStream, Windy | The public data behind World Watch |
+| Jetpack Compose | The HUD interface |
 
 Fonts and other credits are listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
