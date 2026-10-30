@@ -19,7 +19,6 @@ Last updated: 29 October 2026. First released: 24 October 2026.
 3.1 The Application stores the following within its private storage area on the device:
 - Conversation history, limited to the most recent 500 messages;
 - Task entries created by the User;
-- An activity log limited to the most recent 50 entries;
 - The User's name, where supplied;
 - Configuration settings, including wake-word sensitivity and voice preferences;
 - Third-party API credentials supplied by the User (Groq and, optionally, Fish Audio);
@@ -54,7 +53,7 @@ Last updated: 29 October 2026. First released: 24 October 2026.
 - Install packages: installation of an update that the User has chosen to download. Android additionally requires the User to authorise this separately.
 
 ## 8. Retention and Deletion
-8.1 Information remains on the device until removed by the User. "Delete all app data" in Settings stops the wake-word listener and erases everything the Application stored on the device: conversations, tasks, activity, name, API credentials, settings, downloaded model files and cached files. The Memory screen erases conversation history. Uninstalling the Application removes all of it.
+8.1 Information remains on the device until removed by the User. "Delete all app data" in Settings stops the wake-word listener and erases everything the Application stored on the device: conversations, tasks, name, API credentials, settings, downloaded model files and cached files. The Memory screen erases conversation history. Uninstalling the Application removes all of it.
 8.2 Retention by third parties is governed by their own policies.
 
 ## 9. Eligibility and Minors

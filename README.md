@@ -40,10 +40,10 @@ The AI itself is **[Groq](https://groq.com)** with **your own free API key**. No
 | 🗣️ **Spoken Replies** | Uses your phone's own text-to-speech. Turn it on or off with **SPEAK** |
 | 🎤 **Custom Voice (optional)** | Add a **Fish Audio** key and voice ID for a custom voice. If it fails or is blank, the phone voice is used automatically |
 | ✅ **Tasks** | Add tasks by typing or by voice: *"add a task buy milk"* |
-| 🗂️ **Memory screen** | Your saved conversation history, with counts for messages, tasks and activity. Clear it any time |
+| 🗂️ **Memory screen** | Your saved conversation history, with counts for messages and tasks. Clear it any time |
 | 🛠️ **Tools** | Live battery and RAM, plus shortcuts to Wi-Fi, Bluetooth, app settings, notification settings and battery saver. **Each one asks you first** |
 | 🌐 **Live 3D Sphere** | The Home screen centrepiece: a rotating dot-globe with a glowing core, a sweeping light band, three tilted rings with orbiting satellites and a HUD tick ring. It spins faster and ripples while Jarvis is listening, thinking or speaking, and animates only while the app is on screen. Nothing to set up |
-| 🏠 **HUD Home** | A live 3D sphere that reacts to Jarvis, AI key status, system gauges, shortcuts and a recent-activity log |
+| 🏠 **HUD Home** | A live 3D sphere that reacts to Jarvis, AI key status, system gauges, shortcuts (including World view and a Termux server start button) |
 | 🔋 **24/7 Mode** | Keeps "Hey Jarvis" listening with the screen off, with a watchdog that brings the listener back |
 | 🔄 **In-App Updates** | **Settings → About, legal and updates → Check** |
 | 🧹 **One-Tap Wipe** | **Settings → Data and privacy → Delete all app data** removes everything |
@@ -194,7 +194,7 @@ Jarvis handles these **on the phone itself** (no AI call needed). Anything else 
 
 ## 🔒 Privacy
 
-- 📱 Your chats, tasks, activity and keys are stored **on your phone**. Keys are protected with the Android Keystore.
+- 📱 Your chats, tasks and keys are stored **on your phone**. Keys are protected with the Android Keystore.
 - 🚫 The developer operates **no servers** and collects **no data**. There are no ads, trackers or accounts.
 - 🌐 What does leave your phone:
   - 🧠 Your messages go **straight from your phone to Groq** to get an answer.
@@ -202,7 +202,7 @@ Jarvis handles these **on the phone itself** (no AI call needed). Anything else 
   - 🗣️ Speech recognition may be processed by **Google**.
   - 🔄 Update checks and first-time wake-word model downloads contact **GitHub**.
 - 🚫 **No camera and no location.** Jarvis has neither permission.
-- 🧹 **Delete all app data** removes tasks, messages, activity, API keys, downloaded models and settings, and stops the listener.
+- 🧹 **Delete all app data** removes tasks, messages, API keys, downloaded models and settings, and stops the listener.
 
 See [PRIVACY_POLICY.md](PRIVACY_POLICY.md) for the full text.
 
