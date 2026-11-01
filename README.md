@@ -63,7 +63,18 @@ Jarvis handles these **on the phone itself** (no AI call needed). Anything else 
 | *"Open settings"* / *"go to tasks"* | 🧭 Switches screen: home, chat, tasks, memory, tools, settings |
 | *Anything else* | 🧠 Sent to the AI as a normal question |
 
-> 💡 Jarvis is an **assistant you talk to**, not a phone-controller. It opens its own screens and adds tasks, but it does not tap around other apps for you. The Tools screen only offers actions Android allows, and each one asks first.
+> 💡 Jarvis is an **assistant you talk to**, not a phone-controller. It can start timers and alarms, switch the flashlight, set the volume, press media keys and read the battery. Opening the dialer, a text or a settings page needs your tap on **Allow** first, and even then it only opens the phone's own app. It does not use the Accessibility service and does not tap around other apps for you.
+
+| Say | What happens |
+|---|---|
+| *"Set a timer for 10 minutes"* / *"wake me at 6:30"* | ⏱️ Clock app timer / alarm |
+| *"Turn on the torch"* / *"volume 40 percent"* / *"next song"* | 🔦 Flashlight, volume, media keys |
+| *"What's the news on …?"* / *"weather in Paris"* | 🌐 Live web search with sources, weather by city name |
+| *"Remember that I'm vegetarian"* / *"forget that"* | 🧠 Memory stored on your phone |
+| *"Good morning"* | ☀️ Briefing: weather, tasks, watched topics (also an optional daily notification) |
+| *"Watch the Mars mission"* | 👀 Checks the news every ~6 hours, notifies only when something is new |
+
+Tap **INTERRUPT** (or the mic button) to cut Jarvis off mid-sentence. Under Settings, Phone integration: default assistant, floating bar, app lock. Quick Settings tile and home-screen widget are also available.
 
 ---
 
@@ -200,8 +211,10 @@ Jarvis handles these **on the phone itself** (no AI call needed). Anything else 
   - 🧠 Your messages go **straight from your phone to Groq** to get an answer.
   - 🎤 Spoken replies go to **Fish Audio** only if you add a key.
   - 🗣️ Speech recognition may be processed by **Google**.
+  - 🔎 Web questions send a short search to **DuckDuckGo / Wikipedia** and open public pages; weather sends only a **city name** to **Open-Meteo**.
   - 🔄 Update checks and first-time wake-word model downloads contact **GitHub**.
-- 🚫 **No camera and no location.** Jarvis has neither permission.
+- 🚫 **No camera and no location.** Jarvis has neither permission. Weather uses a city you name.
+- 🔒 Optional **app lock** uses Android's own fingerprint / face / screen-lock prompt.
 - 🧹 **Delete all app data** removes tasks, messages, API keys, downloaded models and settings, and stops the listener.
 
 See [PRIVACY_POLICY.md](PRIVACY_POLICY.md) for the full text.

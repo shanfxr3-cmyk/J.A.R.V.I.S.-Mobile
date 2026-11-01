@@ -1,7 +1,7 @@
 # Usage Policy
 
 J.A.R.V.I.S. Mobile
-Last updated: 29 October 2026.
+Last updated: 1 November 2026.
 
 ## 1. Purpose
 1.1 This Usage Policy (the "Policy") forms part of the Terms and Conditions and governs the conduct of every User of J.A.R.V.I.S. Mobile (the "Application"). It is accepted again when it changes materially.

@@ -5,6 +5,9 @@ J.A.R.V.I.S. Mobile stands on other people's work. Thank you to all of them.
 ## Libraries inside the app
 - Kotlin, Jetpack Compose, AndroidX (Activity, Lifecycle, Core) and Material 3: Apache License 2.0. Copyright The Android Open Source Project, Google LLC and JetBrains s.r.o.
 - ONNX Runtime for Android: MIT License. Copyright Microsoft Corporation. Runs the wake-word models.
+- OkHttp and Okio: Apache License 2.0. Copyright Square, Inc. Used for web search and weather requests.
+- jsoup: MIT License. Copyright Jonathan Hedley. Reads the text of web pages.
+- JUnit 4 (tests only, not shipped): Eclipse Public License 1.0.
 - openWakeWord (code): Apache License 2.0. Copyright David Scripka.
 
 ## Downloaded at runtime, not bundled in the app
