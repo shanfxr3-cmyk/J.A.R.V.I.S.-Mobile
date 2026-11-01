@@ -56,6 +56,11 @@ jobs:
           test -n "$SETTINGS" || { echo "settings.gradle.kts not found in the zip"; exit 1; }
           echo "SRC=$(dirname "$SETTINGS")" >> "$GITHUB_ENV"
 
+      # Fast JVM unit tests (sentence cutting, model ladder, tools). A failing test stops the build before signing.
+      - name: Unit tests
+        working-directory: ${{ env.SRC }}
+        run: gradle --no-daemon testReleaseUnitTest
+
       - name: Prepare signing key
         id: sign
         env:
