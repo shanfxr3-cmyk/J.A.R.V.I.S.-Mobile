@@ -50,6 +50,12 @@ The AI itself is **[Groq](https://groq.com)** with **your own free API key**. No
 
 ---
 
+## 🔊 Spoken alerts and the hub
+
+Jarvis can speak on its own, even with the phone locked: a morning briefing, finished background jobs ("research this and tell me when done"), watched-topic alerts and low-battery warnings. Alerts come from your **jarvis-hub** (the Node server in `hub/`), which the app polls through a small standby notification. Set the hub's **https** address and token in Settings, AI provider. Turn off battery optimisation for Jarvis, or the phone may pause the standby service. The hub bot in Telegram has the same tools as the app.
+
+---
+
 ## 🗣️ What You Can Say
 
 Jarvis handles these **on the phone itself** (no AI call needed). Anything else goes to the AI.
