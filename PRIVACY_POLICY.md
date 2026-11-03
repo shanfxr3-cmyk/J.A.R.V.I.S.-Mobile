@@ -11,7 +11,7 @@ Last updated: 1 November 2026. First released: 24 October 2026.
 ## 2. Executive Summary
 - The Developer operates no servers for the Application and receives no copy of the User's conversations, voice or credentials.
 - The Application contains no advertising, no analytics, no tracking technologies and no user accounts, and no information is sold or licensed to any party.
-- The Application does not request the camera permission and does not read the device's location.
+- The Application does not request the camera permission. It reads the device's precise location only if the User allows it, and sends it only to the User's own hub (section 6.2).
 - Information is stored on the User's device (not on any server of the Developer) and is removed when the Application is deleted. Content sent to the third-party services in Section 4 is held by them under their own policies.
 - Certain functions transmit information directly from the device to independent third-party services. These are enumerated in Section 4.
 
@@ -31,7 +31,7 @@ Last updated: 1 November 2026. First released: 24 October 2026.
 4.1 The following transmissions occur directly between the User's device and the named third party. The Developer is not a party to, and does not receive, these transmissions. Each third party operates under its own terms and privacy policy, which the User should review.
 - Groq (api.groq.com). When the User converses with the Application, the message, recent conversation history, the current date and time, the User's name (if set), the saved city, remembered facts, watched topics, style instructions, the titles of open tasks, and the results of any tool the AI used (for example text of web pages it read, weather, battery level) are transmitted to Groq, using the User's own API credential, for the purpose of generating a response.
 - Web search and page reading (DuckDuckGo, Wikipedia and the websites the AI chooses to open). When the AI needs current information it sends a short search query to DuckDuckGo or Wikipedia and may open pages on the public web, which can see the device's IP address. Pages on private or local networks are blocked. Page text is passed to Groq as described above and is treated as data, not as instructions. Sources used are listed under the reply.
-- Open-Meteo (open-meteo.com). For weather, only a city name (the one the User says or saved) is sent. The device's location is never read.
+- Open-Meteo (open-meteo.com). For weather, the Application sends only a city name. If the User allows exact location, the User's own hub may send the device's coordinates to Open-Meteo to get local weather.
 - Fish Audio (api.fish.audio). Only where the User supplies a Fish Audio credential, the text of the Application's reply is transmitted for speech synthesis. Absent a credential, the device's built-in voice is used and nothing is transmitted.
 - Android speech recognition. Following activation by the wake word or by manual tap, the User's speech is converted to text by the speech service installed on the device, ordinarily provided by Google. Depending on the device, language packs and settings, audio may be processed by Google. The Developer does not receive this audio.
 - GitHub (github.com and api.github.com). The Application retrieves wake-word model files once from the openWakeWord project, and checks for and downloads updates from the Releases page of this project. GitHub may observe the device's IP address and the fact that a request was made.
@@ -45,7 +45,8 @@ Last updated: 1 November 2026. First released: 24 October 2026.
 
 ## 6. Camera and Location
 6.1 The Application does not request the camera permission and cannot access the camera.
-6.2 The Application does not request any location permission and does not read the device's location. Weather uses only a city name that the User states or saves.
+6.2 The Application asks for location permission only when the User allows it (Settings > Exact location). If allowed, it reads the device's precise position, including in the background while the always-on service runs, and sends the coordinates and accuracy only to the hub address the User configured, so the hub can give local weather and rain alerts. The User can pause sharing in Settings or revoke the permission in Android settings at any time. The developer does not receive the location.
+6.3 If the User pairs a Fire TV, the Application sends remote-control commands to the TV's address on the User's local network and stores the pairing token encrypted on the device. Nothing about the TV is sent to the developer.
 
 ## 7. Permissions
 7.1 The Application requests the following permissions, each solely for the purpose stated:
@@ -61,7 +62,7 @@ Last updated: 1 November 2026. First released: 24 October 2026.
 ## 7A. Phone Actions
 7A.1 The AI can act only through a fixed list of tools: timers, alarms, flashlight, media volume and media keys, battery level, weather, web search, memory and watched topics. Opening the dialer, a text message or a settings page is a separate class of tool that runs only after the User taps Allow in a dialog that the AI cannot answer; these only open the phone's own app and nothing is dialled or sent without the User's further action.
 7A.2 Morning briefings and watched-topic checks run without the screen open and are read-only: the AI may look things up but is given no tool that acts on the phone.
-7A.3 The Application does not use the Accessibility service, does not read other apps or the screen, and does not read contacts, messages, call history or location. Becoming the default assistant lets the power or home button open the Application; it does not share screen content with it.
+7A.3 The Application does not use the Accessibility service, does not read other apps or the screen, and does not read contacts, messages or call history, and reads location only as described in section 6.2. Becoming the default assistant lets the power or home button open the Application; it does not share screen content with it.
 7A.4 App lock, if enabled, uses Android's own fingerprint, face or screen-lock prompt. The Application never receives biometric data.
 
 ## 8. Retention and Deletion
