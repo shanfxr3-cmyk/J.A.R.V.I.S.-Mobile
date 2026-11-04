@@ -23,7 +23,7 @@ J.A.R.V.I.S. Mobile turns your Android phone into a hands-free AI assistant with
 The AI itself is **[Groq](https://groq.com)** with **your own free API key**. Nothing is locked behind a subscription, and there is no account to create with the developer.
 
 - 🆓 Free and open source (Apache License 2.0)
-- 🚫 No ads, no trackers, no accounts, no servers run by the developer
+- 🚫 No ads, no trackers, no accounts, no servers run by the developer (the optional hub is one *you* run)
 - 🔑 You bring your own free Groq key (and, if you want, a Fish Audio key for a custom voice)
 - 🔄 Updates install over the old app and **your data stays**
 - 🛡️ Official builds are signed, and the app tells you if your copy is **OFFICIAL** or **UNOFFICIAL**
@@ -43,7 +43,7 @@ The AI itself is **[Groq](https://groq.com)** with **your own free API key**. No
 | 🗂️ **Memory screen** | Your saved conversation history, with counts for messages and tasks. Clear it any time |
 | 🛠️ **Tools** | Live battery and RAM, plus shortcuts to Wi-Fi, Bluetooth, app settings, notification settings and battery saver. **Each one asks you first** |
 | 🌐 **Live 3D Sphere** | The Home screen centrepiece: a rotating dot-globe with a glowing core, a sweeping light band, three tilted rings with orbiting satellites and a HUD tick ring. It spins faster and ripples while Jarvis is listening, thinking or speaking, and animates only while the app is on screen. Nothing to set up |
-| 🏠 **HUD Home** | A live 3D sphere that reacts to Jarvis, AI key status, system gauges, shortcuts (including World view and a Termux server start button) |
+| 🏠 **HUD Home** | A live 3D sphere that reacts to Jarvis, AI key status, system gauges, shortcuts (Tasks, Chat, Memory, Tools) |
 | 🔋 **24/7 Mode** | Keeps "Hey Jarvis" listening with the screen off, with a watchdog that brings the listener back |
 | 🔄 **In-App Updates** | **Settings → About, legal and updates → Check** |
 | 🧹 **One-Tap Wipe** | **Settings → Data and privacy → Delete all app data** removes everything |
@@ -52,7 +52,18 @@ The AI itself is **[Groq](https://groq.com)** with **your own free API key**. No
 
 ## 🔊 Spoken alerts and the hub
 
-Jarvis can speak on its own, even with the phone locked: a morning briefing, finished background jobs ("research this and tell me when done"), watched-topic alerts and low-battery warnings. Alerts come from your **jarvis-hub** (the Node server in `hub/`), which the app polls through a small standby notification. Set the hub's **https** address and token in Settings, AI provider. Turn off battery optimisation for Jarvis, or the phone may pause the standby service. The hub bot in Telegram has the same tools as the app.
+Jarvis can speak on its own, even with the phone locked: a morning briefing, finished background jobs ("research this and tell me when done"), watched-topic alerts and low-battery warnings. Alerts come from your own **jarvis-hub** (the Node server in the [`hub/`](hub/HUB.md) folder), which the app polls through a small standby notification. Set the hub's **https** address and token in Settings, AI provider. Turn off battery optimisation for Jarvis, or the phone may pause the standby service. The hub bot in Telegram has the same tools as the app.
+
+**Two ways to connect the hub** (details in [hub/HUB.md](hub/HUB.md)):
+
+| Setup | How | What it means |
+|---|---|---|
+| 🅰️ **Recommended** | API key = your Groq key (`gsk_...`), plus the hub address and **Hub token** | Chat goes straight to Groq, fast and independent of the hub. The hub only handles alerts, jobs, location, TV and Telegram |
+| 🅱️ **Hub as the AI** | API key = your hub token, plus the hub address and (optional) **Backup Groq key** | Chat goes through the hub, so the hub also learns from phone chats. If the hub is down and a backup key is saved, Jarvis answers directly from Groq |
+
+> 🔔 The hub and the phone can both speak a morning briefing. Use one: turn off **Speak a morning briefing (on this phone)** if the hub does it, or the reverse.
+
+> 🛡️ Hub safety: the hub listens only on localhost (reach it through a tunnel), a correct token is never locked out, wrong guesses are rate-limited per client address, and once a request has read web text the hub refuses actions that change memory, watches or the TV in that same request.
 
 ---
 
@@ -129,7 +140,7 @@ Tap **INTERRUPT** (or the mic button) to cut Jarvis off mid-sentence. Under Sett
 5. Tap **Save & test**. You should see **Connected.** in green.
 6. The Home screen header now shows **KEY SET** in green.
 
-> 🔒 Your key is stored on your phone only and is sent only to `api.groq.com`.
+> 🔒 Your key is stored on your phone only and is sent only to `api.groq.com`. (If you use your hub token as the key, it is sent only to the hub address you set.)
 
 ### 3️⃣ Tell Jarvis your name 👤
 
@@ -219,7 +230,9 @@ Tap **INTERRUPT** (or the mic button) to cut Jarvis off mid-sentence. Under Sett
   - 🗣️ Speech recognition may be processed by **Google**.
   - 🔎 Web questions send a short search to **DuckDuckGo / Wikipedia** and open public pages; weather sends only a **city name** to **Open-Meteo**.
   - 🔄 Update checks and first-time wake-word model downloads contact **GitHub**.
-- 🚫 **No camera and no location.** Jarvis has neither permission. Weather uses a city you name.
+- 🚫 **No camera.** Location is optional and off until you allow it: Jarvis can tell you the approximate place when you ask, and, only if you turn on **Settings → Exact location**, send your precise position to **your own hub** for local rain alerts. It never goes to the developer.
+- 📅 **Calendar and notifications are read only when you ask** ("what's on my calendar", "what notifications did I get"). Notification access is a separate switch in Android settings that you can turn off any time. What is read is passed to the AI like any other tool result.
+- 🏠 **Your own hub** (optional) is run by you. It stores its data in files on your host and may talk to Telegram, Cloudflare, Tavily and others under your accounts. See [PRIVACY_POLICY.md](PRIVACY_POLICY.md) section 4A.
 - 🔒 Optional **app lock** uses Android's own fingerprint / face / screen-lock prompt.
 - 🧹 **Delete all app data** removes tasks, messages, API keys, downloaded models and settings, and stops the listener.
 
@@ -258,6 +271,8 @@ buildConfigField("String", "REPO_OWNER", "\"your-github-username\"")
 buildConfigField("String", "REPO_NAME", "\"your-repo-name\"")
 buildConfigField("String", "OFFICIAL_CERT_SHA256", "\"<your own key fingerprint>\"")
 ```
+
+Also open `gradle.properties` and set **`JARVIS_DEFAULT_HUB=`** to your own hub address, or leave it empty. Fresh installs start with that address, so never leave someone else's server there.
 
 | Value | Meaning |
 |---|---|
@@ -327,7 +342,7 @@ Go to **Actions → Android build → Run workflow**. It also runs automatically
 
 1. 📂 Unpacks `jarvis-project.zip` and finds `settings.gradle.kts`.
 2. 🔐 Decodes your signing key from the secrets (only if they are set) and removes it again when the build ends.
-3. 🔨 Builds the signed **release APK** with Gradle 8.9 and JDK 17. This job has a **read-only** token, so build code cannot push or publish anything.
+3. 🔨 Runs the unit tests, then builds the signed **release APK** with Gradle 8.14.3 and JDK 17. This job has a **read-only** token, so build code cannot push or publish anything.
 4. 🏷️ Names the APK with the version and build number and writes a **`.sha256`** checksum next to it.
 5. 🧾 Checks that the APK's signing certificate matches `OFFICIAL_CERT_SHA256` and warns if it does not.
 6. ⬆️ A second job, which never runs project code and never sees your key, publishes a Release tagged `build-<number>` (only when signed with your key, and only on the default branch).
@@ -344,6 +359,7 @@ Set these in `gradle.properties` if you need them:
 | `JARVIS_MINIFY=false` | Turn off code shrinking if a release build ever crashes on launch |
 | `JARVIS_ABIS=arm64-v8a,armeabi-v7a,x86_64` | Add other CPU types, for example for an emulator |
 | `JARVIS_TAG_OFFSET=0` | Only change if you edit the workflow's tag format |
+| `JARVIS_DEFAULT_HUB=https://...` | The hub address fresh installs start with. Empty for a public build |
 
 ### 🧱 Project layout
 
@@ -358,8 +374,11 @@ app/src/main/java/com/jarvis/aiassistant/
 ├── SettingsScreen.kt, ChatScreen.kt, ...                    # the other HUD screens
 ├── KeepAlive.kt, Power.kt                                   # 24/7 mode, watchdog and battery settings
 ├── Updater.kt, Integrity.kt                                 # in-app updates and signature checks
+├── Alerts.kt                                                # hub client, spoken alerts, standby service
 ├── Legal.kt                                                 # consent screen and legal documents
 └── Store.kt, Secrets.kt   # on-device storage and Keystore-protected keys
+
+hub/                       # your own jarvis-hub (Node 18+, no npm packages): see hub/HUB.md
 ```
 
 ---

@@ -1,7 +1,7 @@
 # Privacy Policy
 
 J.A.R.V.I.S. Mobile
-Last updated: 1 November 2026. First released: 24 October 2026.
+Last updated: 4 November 2026. First released: 24 October 2026.
 
 ## 1. Purpose and Scope
 1.1 This Privacy Policy (the "Policy") sets out how J.A.R.V.I.S. Mobile (the "Application") handles information in connection with its use. The Application is designed, built and published by Shan Akhter, an individual developer (the "Developer", "we", "us").
@@ -9,7 +9,7 @@ Last updated: 1 November 2026. First released: 24 October 2026.
 1.3 By accepting this Policy the User acknowledges the practices described herein. Acceptance is requested again whenever this Policy, the Terms and Conditions or the Usage Policy change materially (see Section 12).
 
 ## 2. Executive Summary
-- The Developer operates no servers for the Application and receives no copy of the User's conversations, voice or credentials.
+- The Developer operates no servers for the Application and receives no copy of the User's conversations, voice, location or credentials. Official builds are not pointed at any server. If the User chooses to connect a personal "hub" (Section 4A), that hub is run by the User, not by the Developer.
 - The Application contains no advertising, no analytics, no tracking technologies and no user accounts, and no information is sold or licensed to any party.
 - The Application does not request the camera permission. It reads the device's precise location only if the User allows it, and sends it only to the User's own hub (section 6.2).
 - Information is stored on the User's device (not on any server of the Developer) and is removed when the Application is deleted. Content sent to the third-party services in Section 4 is held by them under their own policies.
@@ -22,7 +22,7 @@ Last updated: 1 November 2026. First released: 24 October 2026.
 - The User's name, where supplied;
 - Configuration settings, including wake-word sensitivity, voice preferences, personality choice, the User's own style instructions, a saved city name for weather, the morning-briefing schedule, the floating-bar and app-lock choices;
 - Short facts the User asked the Application to remember (at most 60) and topics the User asked it to watch (at most 5);
-- Third-party API credentials supplied by the User (Groq and, optionally, Fish Audio);
+- Third-party API credentials supplied by the User (Groq and, optionally, a backup Groq key, Fish Audio or ElevenLabs), and the address and token of the User's own hub if one is set up;
 - A record of acceptance of the Terms and Conditions and this Policy, comprising the version of the documents accepted and the time of acceptance.
 3.2 Safeguards. API credentials are encrypted before storage using AES-256-GCM, with the encryption key held in the Android Keystore. The Application disables Android backup facilities so that its data is not copied to cloud or computer backups. Conversation history and task entries are protected by the operating system's application sandbox but are not separately encrypted. On a rooted, compromised or shared device such data should be regarded as accessible.
 3.3 No safeguard is absolute. The Developer does not warrant that stored information is immune from unauthorised access.
@@ -32,10 +32,17 @@ Last updated: 1 November 2026. First released: 24 October 2026.
 - Groq (api.groq.com). When the User converses with the Application, the message, recent conversation history, the current date and time, the User's name (if set), the saved city, remembered facts, watched topics, style instructions, the titles of open tasks, and the results of any tool the AI used (for example text of web pages it read, weather, battery level) are transmitted to Groq, using the User's own API credential, for the purpose of generating a response.
 - Web search and page reading (DuckDuckGo, Wikipedia and the websites the AI chooses to open). When the AI needs current information it sends a short search query to DuckDuckGo or Wikipedia and may open pages on the public web, which can see the device's IP address. Pages on private or local networks are blocked. Page text is passed to Groq as described above and is treated as data, not as instructions. Sources used are listed under the reply.
 - Open-Meteo (open-meteo.com). For weather, the Application sends only a city name. If the User allows exact location, the User's own hub may send the device's coordinates to Open-Meteo to get local weather.
-- Fish Audio (api.fish.audio). Only where the User supplies a Fish Audio credential, the text of the Application's reply is transmitted for speech synthesis. Absent a credential, the device's built-in voice is used and nothing is transmitted.
+- Fish Audio (api.fish.audio) or ElevenLabs (api.elevenlabs.io). Only where the User supplies a credential for one of them, the text of the Application's reply is transmitted for speech synthesis. Absent a credential, the device's built-in voice is used and nothing is transmitted.
+- The calendar, notification and location tools. When the User asks, the Application reads calendar events (today and the next days), recent notifications (app, title and short text) or the approximate place name, and the result is passed to the AI service in use (Groq, or the User's hub) like any other tool result. Nothing is read in the background for the Developer, and these functions work only if the User has granted the matching permission.
 - Android speech recognition. Following activation by the wake word or by manual tap, the User's speech is converted to text by the speech service installed on the device, ordinarily provided by Google. Depending on the device, language packs and settings, audio may be processed by Google. The Developer does not receive this audio.
 - GitHub (github.com and api.github.com). The Application retrieves wake-word model files once from the openWakeWord project, and checks for and downloads updates from the Releases page of this project. GitHub may observe the device's IP address and the fact that a request was made.
 4.2 No other transmission occurs. There is no concealed upload.
+
+## 4A. The User's Own Hub (Optional)
+4A.1 The Application can connect to a "jarvis-hub": a small server program that the User runs on a computer or hosting service of the User's choice. It is optional. Without a hub address and token in Settings, nothing in this Section happens.
+4A.2 With a hub configured, the Application sends to it, over https only: AI chat requests (when the User's key is a hub token), background-job requests, watch-topic changes, TV remote results and, only if the User allows exact location, the device's precise position. It receives spoken alerts and TV commands from it.
+4A.3 The hub is operated by the User. It stores its data (for example remembered facts, reminders, notes and to-dos) in files on the User's own host, and it may itself contact services such as Groq, Telegram, Tavily, Open-Meteo, Google News and Cloudflare under the User's own accounts. The Developer does not receive any of this and is not responsible for the User's hub or for how its host stores data. The User should protect the hub token like a password.
+4A.4 If the User has saved a backup Groq key and the hub cannot be reached, the Application sends the chat request directly to Groq instead.
 4.3 These connections use HTTPS. Third parties may process information outside the User's country of residence, and the Developer has no control over such processing.
 
 ## 5. Microphone
@@ -57,12 +64,15 @@ Last updated: 1 November 2026. First released: 24 October 2026.
 - Alarm clock: setting timers and alarms in the clock app when the User asks.
 - Display over other apps (optional, granted by the User in Android settings): the floating bar shown after the wake word. The bar cannot be touched.
 - Notifications: also used for the optional morning briefing and watched-topic alerts.
+- Calendar (read only): reading upcoming events when the User asks.
+- Notification access (optional, granted by the User in Android settings): letting the "what notifications did I get" tool read recent notifications. It can be switched off in Android settings at any time.
+- Location (precise, approximate and background; all optional): the approximate place name when the User asks, and, if the User allows exact location, sharing the position with the User's own hub for local rain alerts while the standby service runs.
 - Install packages: installation of an update that the User has chosen to download. Android additionally requires the User to authorise this separately.
 
 ## 7A. Phone Actions
-7A.1 The AI can act only through a fixed list of tools: timers, alarms, flashlight, media volume and media keys, battery level, weather, web search, memory and watched topics. Opening the dialer, a text message or a settings page is a separate class of tool that runs only after the User taps Allow in a dialog that the AI cannot answer; these only open the phone's own app and nothing is dialled or sent without the User's further action.
+7A.1 The AI can act only through a fixed list of tools: timers, alarms, flashlight, media volume and media keys, battery level, weather, web search and page reading, memory, watched topics and background jobs, opening an installed app, reading the calendar, recent notifications and approximate location, and, if the User has set one up, the remote control of a Fire TV. Opening the dialer, a text message or a settings page is a separate class of tool that runs only after the User taps Allow in a dialog that the AI cannot answer; these only open the phone's own app and nothing is dialled or sent without the User's further action.
 7A.2 Morning briefings and watched-topic checks run without the screen open and are read-only: the AI may look things up but is given no tool that acts on the phone.
-7A.3 The Application does not use the Accessibility service, does not read other apps or the screen, and does not read contacts, messages or call history, and reads location only as described in section 6.2. Becoming the default assistant lets the power or home button open the Application; it does not share screen content with it.
+7A.3 The Application does not use the Accessibility service, does not read the screen or the contents of other apps, and does not read contacts, messages or call history. It reads notifications only if the User turns on notification access, and location only as described in section 6.2. Becoming the default assistant lets the power or home button open the Application; it does not share screen content with it.
 7A.4 App lock, if enabled, uses Android's own fingerprint, face or screen-lock prompt. The Application never receives biometric data.
 
 ## 8. Retention and Deletion
