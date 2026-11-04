@@ -80,7 +80,7 @@ Jarvis handles these **on the phone itself** (no AI call needed). Anything else 
 | *"Open settings"* / *"go to tasks"* | 🧭 Switches screen: home, chat, tasks, memory, tools, settings |
 | *Anything else* | 🧠 Sent to the AI as a normal question |
 
-> 💡 Jarvis is an **assistant you talk to**, not a phone-controller. It can start timers and alarms, switch the flashlight, set the volume, press media keys and read the battery. Opening the dialer, a text or a settings page needs your tap on **Allow** first, and even then it only opens the phone's own app. It does not use the Accessibility service and does not tap around other apps for you.
+> 💡 Jarvis is an **assistant you talk to**. Out of the box it starts timers and alarms, switches the flashlight, sets the volume, presses media keys and reads the battery, and opening the dialer, a text or a settings page needs your tap on **Allow**. If you set up Shizuku and the Accessibility service (Settings, Phone control), it can also read the screen, tap, swipe, type and change phone settings. Those actions ask first unless you turn on "Act without asking", and the risky ones (uninstall, clear data, install, reboot, shell, calls, texts) always ask in chat and never run by voice. Jarvis also speaks first: calendar heads-ups with travel time, charging nudges, leaving and arriving home, an evening summary and, if you switch it on, muting the phone during events.
 
 | Say | What happens |
 |---|---|
