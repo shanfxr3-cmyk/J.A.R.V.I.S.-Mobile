@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - 'jarvis-project.zip'
+      - 'jarvis-project*.zip'
 
 # No permissions by default. Each job below asks only for what it needs.
 permissions: {}
@@ -49,7 +49,7 @@ jobs:
 
       - name: Unpack project
         run: |
-          ZIP=$(find . -maxdepth 2 -name 'jarvis-project*.zip' | head -n 1)
+          ZIP=$(find . -maxdepth 2 -name 'jarvis-project*.zip' | sort -V | tail -n 1)
           test -n "$ZIP" || { echo "jarvis-project.zip not found in the repo"; exit 1; }
           rm -rf project && mkdir project && unzip -q "$ZIP" -d project
           SETTINGS=$(find project -maxdepth 3 -name settings.gradle.kts | head -n 1)
@@ -117,7 +117,8 @@ jobs:
           if [ -z "$GOT" ]; then
             echo "::warning::Could not read the APK certificate."
           elif [ "$GOT" != "$WANT" ]; then
-            echo "::warning::The APK is signed with a key that does not match OFFICIAL_CERT_SHA256 in app/build.gradle.kts. The app will show UNOFFICIAL, and users on a different key cannot update. Fork owners: put your own fingerprint there."
+            echo "::error::The APK is signed with a key that does not match OFFICIAL_CERT_SHA256 in app/build.gradle.kts. Users on a different key cannot update."
+            exit 1
           fi
 
       - name: Collect licence and policy files
