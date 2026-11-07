@@ -121,6 +121,11 @@ jobs:
           NAME="Jarvis-Mobile-v${VN}-build${VC}.apk"
           cp "$APK" "dist/$NAME"
           (cd dist && sha256sum "$NAME" > "$NAME.sha256")
+          TVAPK=$(find "$SRC/tv/build/outputs/apk/release" -name '*.apk' | head -n 1)
+          test -n "$TVAPK" || { echo "No TV APK was produced"; exit 1; }
+          TVNAME="Jarvis-TV-v${VN}-build${VC}.apk"
+          cp "$TVAPK" "dist/$TVNAME"
+          (cd dist && sha256sum "$TVNAME" > "$TVNAME.sha256")
           echo "vn=$VN" >> "$GITHUB_OUTPUT"
           echo "vc=$VC" >> "$GITHUB_OUTPUT"
 
