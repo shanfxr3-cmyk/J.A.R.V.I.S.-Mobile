@@ -36,7 +36,7 @@ The AI itself is **[Groq](https://groq.com)** with **your own free API key**. No
 |---|---|
 | 🎙️ **"Hey Jarvis" Wake Word** | Runs on your phone with openWakeWord. No account, no key. Wake word → beep → you speak one request → Jarvis answers → it waits again |
 | 💬 **Voice and Text Chat** | **MIC** for one request, **VOICE CHAT** for a hands-free back-and-forth, or just type. A **Stop** button cancels a reply for real |
-| 🧠 **Groq AI** | Default model **GPT-OSS 120B** (best quality). Switch to **GPT-OSS 20B** for faster replies and higher free limits, or type any Groq model ID |
+| 🧠 **Gemini + Groq AI** | A six-model ladder (Gemini 3.8 Flash first, GPT-OSS as the last resorts). Edit the order, or type any model ID |
 | 🗣️ **Spoken Replies** | Uses your phone's own text-to-speech. Turn it on or off with **SPEAK** |
 | 🎤 **Custom Voice (optional)** | Add a **Fish Audio** key and voice ID for a custom voice. If it fails or is blank, the phone voice is used automatically |
 | ✅ **Tasks** | Add tasks by typing or by voice: *"add a task buy milk"* |

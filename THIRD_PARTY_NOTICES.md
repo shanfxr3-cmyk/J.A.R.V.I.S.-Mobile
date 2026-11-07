@@ -23,7 +23,7 @@ All six are licensed under the SIL Open Font License 1.1. The full text is below
 - Roboto. Copyright 2011 The Roboto Project Authors (https://github.com/googlefonts/roboto-classic).
 
 ## Data and services you connect yourself
-Groq, Fish Audio, Google speech recognition and GitHub are separate services with their own terms. They are not part of this app.
+Groq, Google Gemini, Fish Audio, Google speech recognition and GitHub are separate services with their own terms. They are not part of this app.
 
 ## SIL Open Font License 1.1
 SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
